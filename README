@@ -1,0 +1,132 @@
+This program is designed to do regular database dumps from either PostgreSQL or
+MySQL. This is useful as a backup strategy for databases, since just copying
+the data-directories is not guaranteed to yield consistent database snapshots.
+
+dbdump.py aims to automate this task along with some additional tasks you might
+want to do while dumping. Hence, this script can optionally dump to a remote
+directory via SSH and optionally encrypts the data with GPG. Both tools are
+usually shipped with any Linux distribution but might require some configuration
+to get it working. 
+
+=== Installation ===
+Simply check out the svn-repository:
+	svn co http://svn.fsinf.at/mati/proj/pub/dbdump
+If you don't want to specify the full path, you can of course copy dbdump.py
+somewhere in your path (/usr/local/bin is usually good). Take care to copy
+libdump/ to somewhere in your python-path (see sys.path). 
+
+=== General parameters ===
+Some parameters influence the general behaviour of this script:
+  --backend=BACKEND
+        Specify the backend to use. This script currently supports postgresql
+	and mysql.
+  --datadir=DATADIR
+        Safe the dumps to DATADIR. If used with --remote, DATADIR is a directory
+	on the remote machine. (Default: /var/backups/)
+  --su=SU
+        Execute all sql-commands as user SU. You should be able to use su
+	without giving a password.
+  --remote=REMOTE
+        Store dumps remote via SSH. REMOTE will be passed to ssh unchanged.
+	Example: "user@backup.example.com". Please see the section
+		"Dump to a remote location with SSH"
+	below for further details.
+  --sign=SIGN_KEY
+        Sign data with GPG. Please see section "Sign/Encrypt dumps using GPG"
+	below for further details.
+  --encrypt=RECIPIENT
+  	Encrypt data with GPG. Please see section "Sign/Encrypt dumps using GPG"
+	below for further details.
+
+=== Basic MySQL-configuration ===
+To use this script to dump MySQL databases, use --backend=mysql. So far, this
+backend only supports the option --defaults, which specifies a defaults-file
+that will be used by all mysql commands. This file should be used to specify
+login-credentials and any other options you might want to use. A typical file
+would be:
+<defaults-file>
+[mysqldump]
+user            = dump
+socket          = /var/run/mysqld-mars/mysqld.sock
+password        = <password>
+
+[client]
+user            = dump
+socket          = /var/run/mysqld-mars/mysqld.sock
+password        = <password>
+</defaults-file>
+
+To create a dump-user, you might issue this SQL-statement:
+	GRANT SELECT, LOCK TABLES ON *.* TO 'dump'@'localhost' IDENTIFIED BY \
+		'<password>';
+
+=== Basic PostgreSQL-configuration ===
+To use this script to dump PostgreSQL databases, use --backend=postgresql. This
+script internally uses the tools psql (to get a list of databases to dump) and
+pg_dump (to actually dump the databases), both must be available in your path.
+You can pass additional parameters to those tools using:
+  --psql-options=PSQL_OPTS
+        PSQL_OPTS will be passed unmodified to psql. Note that psql is already
+	called with -lAq in any case.
+  --pg_dump-options=PGDUMP_OPTS
+        PGDUMP_OPTS will be passed unmodified to pg_dump.
+If you want to specify more than one parameter, you usually have to quote them. 
+
+=== Dump to a remote location with SSH ===
+To dump to a remote location, use the --remote parameter. Its value is directly
+passed to ssh, before the command that it remotly runs, so you can use --remote
+to pass any parameter to ssh. The minimum is the hostname that should be ssh'd
+to. Example:
+	dbdump.py <general opts> --remote="user@backup.example.com"
+
+Note that if you intend to use this feature with a cron-job, you have to be able
+to ssh to the remote machine without a password. If you don't know how to set
+this up, try to google for "SSH public key authentication".
+
+=== Sign/Encrypt dumps using GPG ===
+Warning: If you encrypt dumps with GPG and do a full filesystem-dump to the same
+machine, take care that the private key is *not* saved to the same machine.
+Otherwise an attacker compromising the backup-machine might easily be able to
+forge backups.
+
+This script can optionally sign and/or encrypt your dumps. Use the following two
+parameters to use gpg:
+  --sign=SIGN_KEY
+  	Use gpg to sign the dump using the key SIGN_KEY.
+  --encrypt=RECIPIENT
+  	Use gpg to encrypt the dumps for RECIPIENT.
+
+Note that if you intend to use this feature with a cron-job, you have to be able
+to use gpg without a password. This usually means that the key used to sign the
+dumps does not use a password. 
+
+Also note that encryption is done at the local machine, hence no unencrypted
+data ever reaches the backup-machine. This is to ensure that data is not sniffed
+at any point, but has the drawback of putting an additional load on the primary
+machine.
+
+=== Additional database-backends ===
+I took care to implement this script in a way that you can easily implement
+additional database-backends. To do this, create a file in the libdump-folder
+and create a class like this:
+
+<code>
+from libdump import backend
+
+class your_backend( backend.backend ):
+	def get_db_list( self ):
+		"""This function returns a list of databases to dump."""
+		# <your code here>
+	
+	def get_command( self, database ):
+		"""This function returns a command (as a list) that dumps 
+		   the given database to stdout. Example return value would be:
+
+		   [ 'ls', '-l', '-a', database ]
+		   (Not an actual working example ;-))
+		"""
+</code>
+
+Next, modify dbdump.py. Just search for "backend", the modifications should be
+clear. If you implement interesting backends please send them to me
+(mati@fsinf.at) and I'll be happy to integrate them.
