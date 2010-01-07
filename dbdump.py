@@ -6,7 +6,7 @@ specified directory for backup purposes. Please see the README file
 for how to use this script and supported features. You might also
 try calling this program with '--help'.
 
-Copyright 2009 Mathias Ertl
+Copyright 2009, 2010 Mathias Ertl
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
