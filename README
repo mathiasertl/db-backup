@@ -8,14 +8,14 @@ are matched to those of dbdump, so they work together.
 
 === Installation ===
 Simply check out the svn-repository:
-        svn co http://svn.fsinf.at/mati/proj/pub/dbdump
-If you don't want to specify the full path, you can of course copy dbdump.py
+        svn co http://svn.fsinf.at/mati/proj/pub/dbclean
+If you don't want to specify the full path, you can of course copy dbclean.py
 somewhere in your path (/usr/local/bin is usually good).
 
 Note that this script *requires* python 3.0 or later.
 
 === General parameters ===
-Please see dbdump -h for all known parameters.
+Please see dbclean -h for all known parameters.
 
 === Configuration ===
 A sample configuration file is included with the source code, see:
