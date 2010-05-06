@@ -13,7 +13,9 @@ Simply check out the svn-repository:
 	svn co http://svn.fsinf.at/mati/proj/pub/dbdump
 If you don't want to specify the full path, you can of course copy dbdump.py
 somewhere in your path (/usr/local/bin is usually good). Take care to copy
-libdump/ to somewhere in your python-path (see sys.path). 
+libdump/ to somewhere in your python-path (see sys.path).
+
+Note that this script *requires* python 3.0 or later.
 
 === General parameters ===
 Some parameters influence the general behaviour of this script:
