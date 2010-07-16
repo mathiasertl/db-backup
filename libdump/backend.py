@@ -87,4 +87,15 @@ class backend():
 			p5.communicate()
 			f.close()
 		time.sleep( 5 )
+	
+	def prepare( self ):
+		pass
 
+	def prepare_db( self, database ):
+		pass
+
+	def cleanup_db( self, database ):
+		pass
+
+	def cleanup( self ):
+		pass

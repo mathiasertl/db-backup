@@ -13,20 +13,18 @@ Simply check out the svn-repository:
 	svn co http://svn.fsinf.at/mati/proj/pub/dbdump
 If you don't want to specify the full path, you can of course copy dbdump.py
 somewhere in your path (/usr/local/bin is usually good). Take care to copy
-libdump/ to somewhere in your python-path (see sys.path).
-
-Note that this script *requires* python 3.0 or later.
+libdump/ to somewhere in your python-path (see sys.path). 
 
 === General parameters ===
 Some parameters influence the general behaviour of this script:
   --backend=BACKEND
-        Specify the backend to use. This script currently supports postgresql
-	and mysql.
+        Specify the backend to use. This script currently supports postgresql,
+	mysql and ejabberd.
   --datadir=DATADIR
-        Safe the dumps to DATADIR. If used with --remote, DATADIR is a directory
+        Save the dumps to DATADIR. If used with --remote, DATADIR is a directory
 	on the remote machine. (Default: /var/backups/)
   --su=SU
-        Execute all sql-commands as user SU. You should be able to use su
+        Execute all sql-commands as user SU. You must be able to use su
 	without giving a password.
   --remote=REMOTE
         Store dumps remote via SSH. REMOTE will be passed to ssh unchanged.
@@ -46,17 +44,16 @@ backend only supports the option --defaults, which specifies a defaults-file
 that will be used by all mysql commands. This file should be used to specify
 login-credentials and any other options you might want to use. A typical file
 would be:
-<defaults-file>
-[mysqldump]
-user            = dump
-socket          = /var/run/mysqld-mars/mysqld.sock
-password        = <password>
 
-[client]
-user            = dump
-socket          = /var/run/mysqld-mars/mysqld.sock
-password        = <password>
-</defaults-file>
+	[mysqldump]
+	user            = dump
+	socket          = /var/run/mysqld/mysqld.sock
+	password        = <password>
+
+	[client]
+	user            = dump
+	socket          = /var/run/mysqld/mysqld.sock
+	password        = <password>
 
 To create a dump-user, you might issue this SQL-statement:
 	GRANT SELECT, LOCK TABLES ON *.* TO 'dump'@'localhost' IDENTIFIED BY \
@@ -66,6 +63,7 @@ To create a dump-user, you might issue this SQL-statement:
 To use this script to dump PostgreSQL databases, use --backend=postgresql. This
 script internally uses the tools psql (to get a list of databases to dump) and
 pg_dump (to actually dump the databases), both must be available in your path.
+
 You can pass additional parameters to those tools using:
   --psql-options=PSQL_OPTS
         PSQL_OPTS will be passed unmodified to psql. Note that psql is already
@@ -73,6 +71,22 @@ You can pass additional parameters to those tools using:
   --pg_dump-options=PGDUMP_OPTS
         PGDUMP_OPTS will be passed unmodified to pg_dump.
 If you want to specify more than one parameter, you usually have to quote them. 
+
+=== Basic ejabberd configuration ===
+You can also use this tool do dump an ejabberd database. This just uses the
+command-line tool ejabberdctl to dump the database to a file and cat to dump
+that file to stdout. The file is removed afterwards.
+
+The ejabberd backend supports these options:
+  --node NODE
+	Dump the database from this ejabberd node. This is passed unchanged to 
+	ejabberdctl
+  --auth USER HOST PASSWD
+	Authenticate with the node using this user, host and password. This is
+	a regular account on that jabber node.
+  --base-dir=PATH
+	The directory where ejabberdctl by default stores the dump files. This
+	is required to find the ejabberdctl dump file and delete it afterwards.
 
 === Dump to a remote location with SSH ===
 To dump to a remote location, use the --remote parameter. Its value is directly
