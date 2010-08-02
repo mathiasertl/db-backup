@@ -126,6 +126,10 @@ now = time.time()
 
 # loop through each dir in datadir
 for dir in os.listdir( datadir ):
+	if dir.startswith( '.' ):
+		# skip hidden directories
+		continue
+
 	fullpath = os.path.normpath( datadir + '/' + dir )
 	if not os.path.isdir( fullpath ):
 		print( "Warning: %s: Not a directory." % (fullpath) )
