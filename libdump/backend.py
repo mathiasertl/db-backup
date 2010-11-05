@@ -36,9 +36,12 @@ class backend():
 
 	def get_ssh( self, path, cmds ):
 		cmds = [ ' '.join( cmd ) for cmd in cmds ]
+		opts = self.options.remote.split()
 		prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
 		ssh_cmd = prefix + ' | '.join( cmds ) + ' > %s.md5' %(path)
-		return [ 'ssh', self.options.remote, ssh_cmd ]
+		test = [ 'ssh' ] + opts + [ ssh_cmd ]
+		print( test )
+		return test
 
 	def dump( self, db, timestamp ):
 		cmd = self.make_su( self.get_command( db ) )
