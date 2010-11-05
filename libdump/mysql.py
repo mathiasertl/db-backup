@@ -32,7 +32,7 @@ class mysql( backend.backend ):
 			raise Exception( "Unable to get list of databases: %s "
 				% ( stderr.decode().strip("\n") ) )
 
-		return databases
+		return [ db for db in databases if db != 'information_schema' ]
 
 	def get_command( self, database ):
 		cmd = [ 'mysqldump' ]
