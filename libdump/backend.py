@@ -40,7 +40,6 @@ class backend():
 		prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
 		ssh_cmd = prefix + ' | '.join( cmds ) + ' > %s.md5' %(path)
 		test = [ 'ssh' ] + opts + [ ssh_cmd ]
-		print( test )
 		return test
 
 	def dump( self, db, timestamp ):
