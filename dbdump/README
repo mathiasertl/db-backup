@@ -9,8 +9,8 @@ usually shipped with any Linux distribution but might require some configuration
 to get it working. 
 
 === Installation ===
-Simply check out the svn-repository:
-	svn co http://svn.fsinf.at/mati/proj/pub/dbdump
+Simply check out the git-repository:
+	git clone http://git.git.fsinf.at/fsinf/db-backup.git
 If you don't want to specify the full path, you can of course copy dbdump.py
 somewhere in your path (/usr/local/bin is usually good). Take care to copy
 libdump/ to somewhere in your python-path (see sys.path). 
