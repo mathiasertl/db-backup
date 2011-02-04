@@ -1,0 +1,2 @@
+We could refactor the config layout so that dbdump and dbclean take the same
+config file.

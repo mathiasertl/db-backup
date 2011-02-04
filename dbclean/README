@@ -1,0 +1,26 @@
+dbclean is designed to cleanup regular database dumps and keep copies at a
+certain granularity for a specified time. It is of course not restricted to
+database dumps but can clean up any files that are saved at regular intervals.
+This script was developed together with dbdump[1], hence its name. The defaults
+are matched to those of dbdump, so they work together.
+
+[1] http://fs.fsinf.at/wiki/dbdump
+
+=== Installation ===
+Simply check out the svn-repository:
+        svn co http://svn.fsinf.at/mati/proj/pub/dbclean
+If you don't want to specify the full path, you can of course copy dbclean.py
+somewhere in your path (/usr/local/bin is usually good).
+
+Note that this script *requires* python 3.0 or later.
+
+=== General parameters ===
+Please see dbclean -h for all known parameters.
+
+=== Configuration ===
+A sample configuration file is included with the source code, see:
+	dbclean.conf.example
+
+After that, you can start the script with
+	dbclean.py --section=example
+where example is the section in your config-file.

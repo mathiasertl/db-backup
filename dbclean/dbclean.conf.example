@@ -1,0 +1,19 @@
+[DEFAULT]
+; settings here will override the default behaviour for all sections.
+hourly = 72
+daily = 31
+; see section for what this is for:
+default example = default
+
+[mars]
+datadir = /var/backups/mysql/mars
+
+[pluto]
+datadir = /var/backups/mysql/pluto
+
+[section]
+; you can also use the interpolation feature of python config-files:
+local example = local
+datadir = /var/%(local example)s/%(__name__)s/%(default example)s
+; the above line will evaluate to "/var/local/section/default".
+
