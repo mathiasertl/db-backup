@@ -1,0 +1,5 @@
+This repository is the home of dbdump/dbclean. 
+
+dbdump is designed to make database dumps at regular intervals.
+
+dbclean is designed to clean up dumps created by dbdump.
