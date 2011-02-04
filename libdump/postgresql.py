@@ -22,7 +22,7 @@ from subprocess import *
 
 class postgresql( backend.backend ):
 	def get_db_list( self ):
-		cmd = [ 'psql', '-lAq' ]
+		cmd = [ 'psql', '-Aqt', '-c', '"select datname from pg_database"' ]
 
 		if self.options.psql_opts:
 			cmd += self.options.psql_opts.split( ' ' )
@@ -32,18 +32,12 @@ class postgresql( backend.backend ):
 
 		p_list = Popen( cmd, stdout=PIPE, stderr=PIPE )
 		stdout, stderr = p_list.communicate()
-		databases = []
-		for line in stdout.decode().split( "\n" )[2:][:-2]:
-			db = line.split( '|' )[0]
-			if db == "template0":
-				continue
-			databases.append( db )
+		databases = [ line for line in stdout.decode().strip().split("\n") if line != 'template0' ]
 
 		p_list.wait()
 		if p_list.returncode != 0:
 			raise Exception( "Unable to get list of databases: %s "
 				% ( stderr.decode().strip("\n") ) )
-
 
 		return databases
 
