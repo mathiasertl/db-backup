@@ -35,8 +35,19 @@ class mysql( backend.backend ):
 		return [ db for db in databases if db != 'information_schema' ]
 
 	def get_command( self, database ):
+		engine_cmd = [ 'mysql', '-NB', '''--execute=select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' GROUP BY ENGINE'''%database ]
+		p = Popen( engine_cmd, stdout=PIPE )
+		types = p.communicate()[0].decode('utf-8').strip().split("\n")
+
 		cmd = [ 'mysqldump' ]
 		if self.options.defaults:
 			cmd.append( '--defaults-file=%s' %(self.options.defaults) )
+
+		if types == [ 'InnoDB' ]:
+			cmd.append( '--single-transaction' )
+			cmd.append( '--quick' )
+		else:
+			cmd.append( '--lock-tables' )
+
 		cmd += [ '--comments', database ]
 		return cmd
