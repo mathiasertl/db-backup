@@ -19,8 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from libdump import backend
 from subprocess import *
+import os, sys, stat
 
 class mysql( backend.backend ):
+	def prepare( self ):
+		defaults = os.path.expanduser( self.options.defaults )
+		if not os.path.exists( defaults ):
+			print( "Error: %s: Does not exist."%defaults )
+			sys.exit(1)
+		unsafe = stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP
+		unsafe |= stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
+
+		mode = os.stat( defaults )[stat.ST_MODE]
+		if mode & unsafe != 0:
+			print( "Warning: %s: unsafe permissions (fix with 'chmod go-rwx %s'"%(defaults, defaults) )
+
 	def get_db_list( self ):
 		cmd = [ '/usr/bin/mysql', '--defaults-file=' + self.options.defaults, '--execute=SHOW DATABASES', '-B', '-s' ]
 		p_list = Popen( cmd, stdout=PIPE, stderr=PIPE )
