@@ -88,7 +88,6 @@ class backend():
 			p5 = Popen( sed, stdin=p4.stdout, stdout=f )
 			p5.communicate()
 			f.close()
-		time.sleep( 5 )
 	
 	def prepare( self ):
 		pass

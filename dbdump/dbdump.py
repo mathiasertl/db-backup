@@ -110,4 +110,7 @@ for database in databases:
 	except Exception as e:
 		print( e )
 		continue
+	if database != databases[-1]:
+		time.sleep(3)
+
 backend.cleanup()
