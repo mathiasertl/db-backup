@@ -38,7 +38,7 @@ class backend():
 		cmds = [ ' '.join( cmd ) for cmd in cmds ]
 		opts = self.options.remote.split()
 		prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
-		ssh_cmd = prefix + ' | '.join( cmds ) + ' > %s.md5' %(path)
+		ssh_cmd = prefix + ' | '.join( cmds ) + ' > %s.sha1' %(path)
 		test = [ 'ssh' ] + opts + [ ssh_cmd ]
 		return test
 
@@ -60,11 +60,11 @@ class backend():
 
 		gzip = [ 'gzip', '-f', '-9', '-', '-' ]
 		tee = [ 'tee', path ]
-		md5sum = [ 'md5sum' ]
+		sha1sum = [ 'sha1sum' ]
 		sed = [ 'sed', 's/-$/%s/' %(os.path.basename( path ) ) ]
 
 		if self.options.remote:
-			ssh = self.get_ssh( path, [gzip, tee, md5sum, sed] )
+			ssh = self.get_ssh( path, [gzip, tee, sha1sum, sed] )
 
 			p1 = Popen( cmd, stdout=PIPE )
 			p = p1
@@ -77,14 +77,14 @@ class backend():
 			if not os.path.exists( dir ):
 				os.mkdir( dir, 0o700 )
 
-			f = open( path + '.md5', 'w' )
+			f = open( path + '.sha1', 'w' )
 			p1 = Popen( cmd, stdout=PIPE )
 			p = p1
 			if self.gpg:
 				p = Popen( gpg, stdin=p1.stdout, stdout=PIPE )
 			p2 = Popen( gzip, stdin=p1.stdout, stdout=PIPE )
 			p3 = Popen( tee, stdin=p2.stdout, stdout=PIPE )
-			p4 = Popen( md5sum, stdin=p3.stdout, stdout=PIPE )
+			p4 = Popen( sha1sum, stdin=p3.stdout, stdout=PIPE )
 			p5 = Popen( sed, stdin=p4.stdout, stdout=f )
 			p5.communicate()
 			f.close()
