@@ -48,13 +48,25 @@ class mysql( backend.backend ):
 		return [ db for db in databases if db != 'information_schema' ]
 
 	def get_command( self, database ):
-		engine_cmd = [ 'mysql', '-NB', '''--execute=select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' GROUP BY ENGINE'''%database ]
+		# get list of ignored tables:
+		ignored = [ t for t in self.options.ignore_tables if t.startswith( "%s."%database ) ]
+
+		# assemble query for used engines in the database
+		engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s'"%database
+		for table in ignored:
+			engine_query += " AND TABLE_NAME!='%s'"%table.split('.')[1]
+		engine_query += ' GROUP BY ENGINE'
+
+		engine_cmd = [ 'mysql', '-NB', "--execute=%s"%engine_query ]
 		p = Popen( engine_cmd, stdout=PIPE )
 		types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
 		cmd = [ 'mysqldump' ]
 		if self.options.defaults:
 			cmd.append( '--defaults-file=%s' %(self.options.defaults) )
+
+		for table in ignored:
+			cmd.append( '--ignore-table="%s"'%table )
 
 		if types == [ 'InnoDB' ]:
 			cmd.append( '--single-transaction' )
