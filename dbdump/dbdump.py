@@ -50,7 +50,7 @@ group.add_option( '--defaults', action='store',
 	type='string', dest='defaults', default='~/.my.cnf',
 	help="Defaults-file to connect to your mysql-server (Default: %default)" )
 group.add_option( '--ignore-table', action='append', dest="ignore_tables",
-	metavar='DB_NAME.DB_TABLE',
+	metavar='DB_NAME.DB_TABLE', default=[],
 	help="""Do not dump the given table. Use multiple times to skip more than
 one table.""" )
 parser.add_option_group( group )
@@ -75,7 +75,7 @@ group.add_option( '--base-dir', action="store", default="/var/lib/ejabberd",
 	help="Base directory where the ejabberd database is stored" )
 parser.add_option_group( group )
 
-(options, args) = parser.parse_args()
+options, args = parser.parse_args()
 
 if not options.remote:
 	# Note that if we are remote there is no real way to check to check if
