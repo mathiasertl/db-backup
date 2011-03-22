@@ -52,9 +52,9 @@ class mysql( backend.backend ):
 		ignored = [ t for t in self.options.ignore_tables if t.startswith( "%s."%database ) ]
 
 		# assemble query for used engines in the database
-		engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s'"%database
+		engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' AND ENGINE != 'MEMORY'"%database
 		for table in ignored:
-			engine_query += " AND TABLE_NAME!='%s'"%table.split('.')[1]
+			engine_query += " AND TABLE_NAME != '%s'"%table.split('.')[1]
 		engine_query += ' GROUP BY ENGINE'
 
 		engine_cmd = [ 'mysql' ]
