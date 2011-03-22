@@ -57,7 +57,10 @@ class mysql( backend.backend ):
 			engine_query += " AND TABLE_NAME!='%s'"%table.split('.')[1]
 		engine_query += ' GROUP BY ENGINE'
 
-		engine_cmd = [ 'mysql', '-NB', "--execute=%s"%engine_query ]
+		engine_cmd = [ 'mysql' ]
+		if self.options.defaults:
+			engine_cmd.append( '--defaults-file=%s' %(self.options.defaults) )
+		engine_cmd += [ '-NB', "--execute=%s"%engine_query ]
 		p = Popen( engine_cmd, stdout=PIPE )
 		types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
