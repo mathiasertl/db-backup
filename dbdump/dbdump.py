@@ -111,6 +111,9 @@ for database in databases:
 		backend.prepare_db( database )
 		backend.dump( database, timestamp )
 		backend.cleanup_db( database )
+	except RuntimeError as e:
+		print( e )
+		break
 	except Exception as e:
 		print( e )
 		continue

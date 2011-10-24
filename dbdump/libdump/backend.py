@@ -45,8 +45,8 @@ class backend():
 	def dump( self, db, timestamp ):
 		cmd = self.make_su( self.get_command( db ) )
 
-		dir = os.path.normpath( self.base + '/' + db )
-		path = os.path.normpath( dir + '/' + timestamp )
+		dirname = os.path.normpath( self.base + '/' + db )
+		path = os.path.normpath( dirname + '/' + timestamp )
 		if self.gpg:
 #			gpg = [ 'gpg', '-ser', self.options.gpg, '-' ]
 			gpg = [ 'gpg' ]
@@ -73,9 +73,13 @@ class backend():
 
 			p2 = Popen( ssh, stdin=p.stdout, stdout=PIPE )
 			output = p2.communicate()[0]
+			if p2.returncode == 255:
+				raise RuntimeError( "SSH returned with exit code 255." )
+			elif p2.returncode != 0:
+				raise RuntimeError( "%s returned with exit code %s."%(ssh, p2.returncode) )
 		else:   
-			if not os.path.exists( dir ):
-				os.mkdir( dir, 0o700 )
+			if not os.path.exists( dirname ):
+				os.mkdir( dirname, 0o700 )
 
 			f = open( path + '.sha1', 'w' )
 			p1 = Popen( cmd, stdout=PIPE )
