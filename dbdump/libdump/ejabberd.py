@@ -6,7 +6,7 @@ class ejabberd( backend.backend ):
 		return [ 'ejabberd' ]
 
 	def get_command( self, database ):
-		path = os.path.normpath( self.options.base_dir + '/' + database )
+		path = os.path.normpath( self.options.base_dir + '/' + database + '.backup' )
 		return [ 'cat', path ]
 		
 	def prepare_db( self, database ):
