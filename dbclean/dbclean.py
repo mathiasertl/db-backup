@@ -32,7 +32,7 @@ from optparse import OptionParser
 # determine location of (default) config-file. This can still be overridden by
 # the command line.
 config_file = '/etc/dbclean.conf'
-for file in [ './dbclean.conf', '~/.dbclean.conf' ]:
+for file in [ './dbclean.conf', os.path.expanduser('~/.dbclean.conf') ]:
 	if os.path.exists( file ) and os.path.isfile( file ) and os.access( file, os.R_OK ):
 		config_file = file
 		break
