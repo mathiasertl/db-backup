@@ -31,7 +31,7 @@ from optparse import OptionParser
 
 # determine location of (default) config-file. This can still be overridden by
 # the command line.
-config_file = [ '/etc/dbclean.conf',
+config_file = [ '/etc/dbclean/dbclean.conf',
 	os.path.expanduser('~/.dbclean.conf')
 ]
 
@@ -43,7 +43,7 @@ parser.add_option( '--format', action='store', type='string', dest='timeformat',
 	help="The format the dumps are saved as. See http://docs.python.org/3.0/library/time.html#time.strftime "
 		"for a description of the format. (Default: %Y-%m-%d %H:%M:%S)" )
 parser.add_option( '--config', action='store', type='string', dest='config',
-	help="Location of the config-file (default: /etc/dbclean.conf and  ~/.dbclean.conf)." )
+	help="Location of the config-file (default: /etc/dbclean/dbclean.conf and  ~/.dbclean.conf)." )
 parser.add_option( '--section', action='store', type='string', dest='section',
 	default='DEFAULT', help="Section in the config-file to use (default: %default)" )
 
