@@ -9,7 +9,7 @@ Vcs-Git: http://git.fsinf.at/fsinf/db-backup.git
 
 Package: dbdump
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, ${python:Depends}
+Depends: ${misc:Depends}, ${python3:Depends}
 Description: Regulary dump databases
  This script can be used to regulary dump databases. Notable features include:
  .
@@ -19,6 +19,6 @@ Description: Regulary dump databases
 
 Package: dbclean
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, ${python:Depends}
+Depends: ${misc:Depends}, ${python3:Depends}
 Description: Clean database dumps created by dbdump
  This script can be used to clean databases created by dbdump.
