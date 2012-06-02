@@ -1,13 +1,26 @@
 #!/usr/bin/make -f
 
-DH_ARGS=--with python3,python2
+DH_ARGS=--with python3 --without python-support
+PYVERS=$(shell py3versions -sv)
+
+DBDUMP_PKG_DIR=$(CURDIR)/debian/dbdump/
 
 %:
 	dh $@ ${DH_ARGS}
 
-override_dh_install:
+build-python%:
+	dh_testdir
+	cd dbdump && python$* setup.py build
+
+install-python%:
+	dh_testdir
+	cd dbdump && python$* setup.py install --force --root $(DBDUMP_PKG_DIR) --no-compile -O0 --install-layout=deb
+
+override_dh_auto_build: ${PYVERS:%=build-python%}
+	dh_auto_build
+
+override_dh_install: ${PYVERS:%=install-python%}
 	dh_install
 	
-	find .
 	rename 's/.py//' debian/dbdump/usr/bin/*.py
 	rename 's/.py//' debian/dbclean/usr/bin/*.py
