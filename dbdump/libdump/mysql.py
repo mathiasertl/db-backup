@@ -35,6 +35,7 @@ class mysql( backend.backend ):
 			print( "Warning: %s: unsafe permissions (fix with 'chmod go-rwx %s'"%(defaults, defaults) )
 
 	def get_db_list( self ):
+		excluded = ['information_schema', 'performance_schema']
 		cmd = [ '/usr/bin/mysql', '--defaults-file=' + self.options.defaults, '--execute=SHOW DATABASES', '-B', '-s' ]
 		p_list = Popen( cmd, stdout=PIPE, stderr=PIPE )
 		stdout, stderr = p_list.communicate()
@@ -45,7 +46,7 @@ class mysql( backend.backend ):
 			raise Exception( "Unable to get list of databases: %s "
 				% ( stderr.decode().strip("\n") ) )
 
-		return [ db for db in databases if db != 'information_schema' ]
+		return [ db for db in databases if db not in excluded ]
 
 	def get_command( self, database ):
 		# get list of ignored tables:
