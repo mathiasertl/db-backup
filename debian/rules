@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+DH_ARGS=--with python3,python2
+
+%:
+	dh $@ ${DH_ARGS}
+
+override_dh_install:
+	dh_install
+	
+	find .
+	rename 's/.py//' debian/dbdump/usr/bin/*.py
+	rename 's/.py//' debian/dbclean/usr/bin/*.py

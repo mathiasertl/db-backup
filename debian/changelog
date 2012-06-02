@@ -1,0 +1,5 @@
+db-backup (2012-06-02-1) precise; urgency=low
+
+  * Initial version
+
+ -- Mathias Ertl <apt-repository@fsinf.at>  Sat, 02 Jun 2012 16:10:21 +0200
