@@ -29,9 +29,7 @@
 #recipient = admin@hostname.example.net
 #
 # You can also use the interpolation feature provided by the
-# ConfigParser python module. The following line causes the 'backend'
-# setting in each section to be the same as the respective section name:
-#backend = %(__name__)s
+# ConfigParser python module.
 #
 # You can even specify new settings to use in later interpolation:
 #hostname = example.com

@@ -43,7 +43,6 @@ if args.section=='DEFAULT':
     
 config = configparser.SafeConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
-    'backend': '%(__name__)s',
     'datadir': '/var/backups/%(backend)s',
     'mysql-defaults': '~/.my.cnf',
     'ejabberd-base-dir': '/var/lib/ejabberd',

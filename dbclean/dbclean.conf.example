@@ -8,7 +8,7 @@
 # NOTE: You can also use the interpolation feature provided by the
 # 	ConfigParser python module. The following line is used in the
 #	example.net section:
-#datadir = /var/backups/%(backend)s/%(__name__)s
+#datadir = /var/backups/%(backend)s/example.net
 #
 #[example.com]
 # Clean MySQL dumps from example.com
