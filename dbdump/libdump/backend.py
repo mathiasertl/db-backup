@@ -21,86 +21,86 @@ import os, time
 from subprocess import *
 
 class backend():
-	def __init__( self, options ):
-		self.options = options
-		self.base = options.datadir
-		if self.options.sign_key or self.options.recipient:
-			self.gpg = True
-		else:
-			self.gpg = False
+    def __init__(self, options):
+        self.options = options
+        self.base = options.datadir
+        if self.options.sign_key or self.options.recipient:
+            self.gpg = True
+        else:
+            self.gpg = False
 
-	def make_su( self, cmd ):
-		if self.options.su:
-			cmd = [ 'su', self.options.su, '-s', '/bin/bash', '-c', ' '.join( cmd ) ]
-		return cmd
+    def make_su(self, cmd):
+        if self.options.su:
+            cmd = [ 'su', self.options.su, '-s', '/bin/bash', '-c', ' '.join(cmd) ]
+        return cmd
 
-	def get_ssh( self, path, cmds ):
-		cmds = [ ' '.join( cmd ) for cmd in cmds ]
-		opts = self.options.remote.split()
-		prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
-		ssh_cmd = prefix + ' | '.join( cmds ) + ' > %s.sha1' %(path)
-		test = [ 'ssh' ] + opts + [ ssh_cmd ]
-		return test
+    def get_ssh(self, path, cmds):
+        cmds = [ ' '.join(cmd) for cmd in cmds ]
+        opts = self.options.remote.split()
+        prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
+        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' %(path)
+        test = [ 'ssh' ] + opts + [ ssh_cmd ]
+        return test
 
-	def dump( self, db, timestamp ):
-		cmd = self.make_su( self.get_command( db ) )
+    def dump(self, db, timestamp):
+        cmd = self.make_su(self.get_command(db))
 
-		dirname = os.path.normpath( self.base + '/' + db )
-		path = os.path.normpath( dirname + '/' + timestamp )
-		if self.gpg:
-#			gpg = [ 'gpg', '-ser', self.options.gpg, '-' ]
-			gpg = [ 'gpg' ]
-			if self.options.sign_key:
-				gpg += [ '-s', '-u', self.options.sign_key ]
-			if self.options.recipient:
-				gpg += [ '-e', '-r', self.options.recipient ]
-			path += '.gpg'
-				
-		path += '.gz'
+        dirname = os.path.normpath(self.base + '/' + db)
+        path = os.path.normpath(dirname + '/' + timestamp)
+        if self.gpg:
+#            gpg = [ 'gpg', '-ser', self.options.gpg, '-' ]
+            gpg = [ 'gpg' ]
+            if self.options.sign_key:
+                gpg += [ '-s', '-u', self.options.sign_key ]
+            if self.options.recipient:
+                gpg += [ '-e', '-r', self.options.recipient ]
+            path += '.gpg'
+                
+        path += '.gz'
 
-		gzip = [ 'gzip', '-f', '-9', '-', '-' ]
-		tee = [ 'tee', path ]
-		sha1sum = [ 'sha1sum' ]
-		sed = [ 'sed', 's/-$/%s/' %(os.path.basename( path ) ) ]
+        gzip = [ 'gzip', '-f', '-9', '-', '-' ]
+        tee = [ 'tee', path ]
+        sha1sum = [ 'sha1sum' ]
+        sed = [ 'sed', 's/-$/%s/' %(os.path.basename(path)) ]
 
-		if self.options.remote:
-			ssh = self.get_ssh( path, [gzip, tee, sha1sum, sed] )
+        if self.options.remote:
+            ssh = self.get_ssh(path, [gzip, tee, sha1sum, sed])
 
-			p1 = Popen( cmd, stdout=PIPE )
-			p = p1
-			if self.gpg:
-				p = Popen( gpg, stdin=p1.stdout, stdout=PIPE )
+            p1 = Popen(cmd, stdout=PIPE)
+            p = p1
+            if self.gpg:
+                p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
 
-			p2 = Popen( ssh, stdin=p.stdout, stdout=PIPE )
-			output = p2.communicate()[0]
-			if p2.returncode == 255:
-				raise RuntimeError( "SSH returned with exit code 255." )
-			elif p2.returncode != 0:
-				raise RuntimeError( "%s returned with exit code %s."%(ssh, p2.returncode) )
-		else:   
-			if not os.path.exists( dirname ):
-				os.mkdir( dirname, 0o700 )
+            p2 = Popen(ssh, stdin=p.stdout, stdout=PIPE)
+            output = p2.communicate()[0]
+            if p2.returncode == 255:
+                raise RuntimeError("SSH returned with exit code 255.")
+            elif p2.returncode != 0:
+                raise RuntimeError("%s returned with exit code %s."%(ssh, p2.returncode))
+        else:   
+            if not os.path.exists(dirname):
+                os.mkdir(dirname, 0o700)
 
-			f = open( path + '.sha1', 'w' )
-			p1 = Popen( cmd, stdout=PIPE )
-			p = p1
-			if self.gpg:
-				p = Popen( gpg, stdin=p1.stdout, stdout=PIPE )
-			p2 = Popen( gzip, stdin=p1.stdout, stdout=PIPE )
-			p3 = Popen( tee, stdin=p2.stdout, stdout=PIPE )
-			p4 = Popen( sha1sum, stdin=p3.stdout, stdout=PIPE )
-			p5 = Popen( sed, stdin=p4.stdout, stdout=f )
-			p5.communicate()
-			f.close()
-	
-	def prepare( self ):
-		pass
+            f = open(path + '.sha1', 'w')
+            p1 = Popen(cmd, stdout=PIPE)
+            p = p1
+            if self.gpg:
+                p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
+            p2 = Popen(gzip, stdin=p1.stdout, stdout=PIPE)
+            p3 = Popen(tee, stdin=p2.stdout, stdout=PIPE)
+            p4 = Popen(sha1sum, stdin=p3.stdout, stdout=PIPE)
+            p5 = Popen(sed, stdin=p4.stdout, stdout=f)
+            p5.communicate()
+            f.close()
+    
+    def prepare(self):
+        pass
 
-	def prepare_db( self, database ):
-		pass
+    def prepare_db(self, database):
+        pass
 
-	def cleanup_db( self, database ):
-		pass
+    def cleanup_db(self, database):
+        pass
 
-	def cleanup( self ):
-		pass
+    def cleanup(self):
+        pass
