@@ -23,20 +23,22 @@ import os, sys, stat
 
 class mysql(backend.backend):
     def prepare(self):
-        defaults = os.path.expanduser(self.options.defaults)
+        defaults = os.path.expanduser(self.section['defaults'])
         if not os.path.exists(defaults):
-            print("Error: %s: Does not exist."%defaults)
+            print("Error: %s: Does not exist." % defaults, file=sys.stderr)
             sys.exit(1)
         unsafe = stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP
         unsafe |= stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
 
         mode = os.stat(defaults)[stat.ST_MODE]
         if mode & unsafe != 0:
-            print("Warning: %s: unsafe permissions (fix with 'chmod go-rwx %s'"%(defaults, defaults))
+            print("Warning: %s: unsafe permissions (fix with 'chmod go-rwx %s')"
+                  % (defaults, defaults), file=sys.stderr)
 
     def get_db_list(self):
         excluded = ['information_schema', 'performance_schema']
-        cmd = [ '/usr/bin/mysql', '--defaults-file=' + self.options.defaults, '--execute=SHOW DATABASES', '-B', '-s' ]
+        cmd = ['/usr/bin/mysql', '--defaults-file=' + self.section['defaults'],
+               '--execute=SHOW DATABASES', '-B', '-s']
         p_list = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p_list.communicate()
         databases = stdout.decode().strip("\n").split("\n")
@@ -50,7 +52,7 @@ class mysql(backend.backend):
 
     def get_command(self, database):
         # get list of ignored tables:
-        ignored = [ t for t in self.options.ignore_tables if t.startswith("%s."%database) ]
+        ignored = [ t for t in self.section['ignore-tables'] if t.startswith("%s." % database) ]
 
         # assemble query for used engines in the database
         engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' AND ENGINE != 'MEMORY'"%database
@@ -59,22 +61,22 @@ class mysql(backend.backend):
         engine_query += ' GROUP BY ENGINE'
 
         engine_cmd = [ 'mysql' ]
-        if self.options.defaults:
-            engine_cmd.append('--defaults-file=%s' %(self.options.defaults))
-        engine_cmd += [ '-NB', "--execute=%s"%engine_query ]
+        if self.section['defaults']:
+            engine_cmd.append('--defaults-file=%s' % self.section['defaults'])
+        engine_cmd += [ '-NB', "--execute=%s" % engine_query ]
+        
         p = Popen(engine_cmd, stdout=PIPE)
         types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
         cmd = [ 'mysqldump' ]
         if self.options.defaults:
-            cmd.append('--defaults-file=%s' %(self.options.defaults))
+            cmd.append('--defaults-file=%s' % self.section['defaults'])
 
         for table in ignored:
-            cmd.append('--ignore-table="%s"'%table)
+            cmd.append('--ignore-table="%s"' % table)
 
         if types == [ 'InnoDB' ]:
-            cmd.append('--single-transaction')
-            cmd.append('--quick')
+            cmd += ['--single-transaction', '--quick']
         else:
             cmd.append('--lock-tables')
 
