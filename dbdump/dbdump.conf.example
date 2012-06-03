@@ -47,12 +47,12 @@
 #
 # Use a custom defaults-file. This file should be used to specify access
 # credentials:
-#defaults = ~/.my.cnf
+#mysql-defaults = ~/.my.cnf
 #
 # Ignore given tables when dumping. This can be useful if a certain
 # table does not use InnoDB and the database could not be dumped in a
 # single transaction otherwise (optional):
-#ignore-tables = db_foo.table_bla db_bar.table_hugo
+#mysql-ignore-tables = db_foo.table_bla db_bar.table_hugo
 #
 #[postgresql]
 # Dump PostgreSQL databases.
@@ -63,8 +63,8 @@
 # POSTGRESQL OPTIONS:
 #
 # Additional command-line parameters for psql and pgdump (optional):
-#psql-opts = --someopt
-#pgdump-opts = --otheropt
+#postgresql-psql-opts = --someopt
+#postgresql-pgdump-opts = --otheropt
 #
 #[ejabberd]
 # Dump ejabberd databases.

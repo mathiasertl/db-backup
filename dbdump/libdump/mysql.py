@@ -23,7 +23,7 @@ import os, sys, stat
 
 class mysql(backend.backend):
     def prepare(self):
-        defaults = os.path.expanduser(self.section['defaults'])
+        defaults = os.path.expanduser(self.section['mysql-defaults'])
         if not os.path.exists(defaults):
             print("Error: %s: Does not exist." % defaults, file=sys.stderr)
             sys.exit(1)
@@ -37,7 +37,7 @@ class mysql(backend.backend):
 
     def get_db_list(self):
         excluded = ['information_schema', 'performance_schema']
-        cmd = ['/usr/bin/mysql', '--defaults-file=' + self.section['defaults'],
+        cmd = ['/usr/bin/mysql', '--defaults-file=' + self.section['mysql-defaults'],
                '--execute=SHOW DATABASES', '-B', '-s']
         p_list = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p_list.communicate()
@@ -52,7 +52,7 @@ class mysql(backend.backend):
 
     def get_command(self, database):
         # get list of ignored tables:
-        ignored_tables = self.section['ignore-tables'].split()
+        ignored_tables = self.section['mysql-ignore-tables'].split()
         ignored = [ t for t in ignored_tables if t.startswith("%s." % database) ]
 
         # assemble query for used engines in the database
@@ -62,8 +62,8 @@ class mysql(backend.backend):
         engine_query += ' GROUP BY ENGINE'
 
         engine_cmd = [ 'mysql' ]
-        if self.section['defaults']:
-            engine_cmd.append('--defaults-file=%s' % self.section['defaults'])
+        if self.section['mysql-defaults']:
+            engine_cmd.append('--defaults-file=%s' % self.section['mysql-defaults'])
         engine_cmd += [ '-NB', "--execute=%s" % engine_query ]
         
         p = Popen(engine_cmd, stdout=PIPE)
@@ -71,7 +71,7 @@ class mysql(backend.backend):
 
         cmd = [ 'mysqldump' ]
         if self.options.defaults:
-            cmd.append('--defaults-file=%s' % self.section['defaults'])
+            cmd.append('--defaults-file=%s' % self.section['mysql-defaults'])
 
         for table in ignored:
             cmd.append('--ignore-table="%s"' % table)
