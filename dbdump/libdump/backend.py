@@ -21,22 +21,22 @@ import os, time
 from subprocess import *
 
 class backend():
-    def __init__(self, options):
-        self.options = options
-        self.base = options.datadir
-        if self.options.sign_key or self.options.recipient:
+    def __init__(self, section):
+        self.section = section
+        self.base = section['datadir']
+        if 'sign_key' in section or 'recipient' in section:
             self.gpg = True
         else:
             self.gpg = False
 
     def make_su(self, cmd):
-        if self.options.su:
-            cmd = [ 'su', self.options.su, '-s', '/bin/bash', '-c', ' '.join(cmd) ]
+        if 'su' in self.section:
+            cmd = [ 'su', self.section.su, '-s', '/bin/bash', '-c', ' '.join(cmd) ]
         return cmd
 
     def get_ssh(self, path, cmds):
         cmds = [ ' '.join(cmd) for cmd in cmds ]
-        opts = self.options.remote.split()
+        opts = self.section['remote'].split()
         prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
         ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' %(path)
         test = [ 'ssh' ] + opts + [ ssh_cmd ]
@@ -48,12 +48,11 @@ class backend():
         dirname = os.path.normpath(self.base + '/' + db)
         path = os.path.normpath(dirname + '/' + timestamp)
         if self.gpg:
-#            gpg = [ 'gpg', '-ser', self.options.gpg, '-' ]
             gpg = [ 'gpg' ]
-            if self.options.sign_key:
-                gpg += [ '-s', '-u', self.options.sign_key ]
-            if self.options.recipient:
-                gpg += [ '-e', '-r', self.options.recipient ]
+            if 'sign_key' in self.section:
+                gpg += [ '-s', '-u', self.section['sign_key'] ]
+            if 'recipient' in self.section:
+                gpg += [ '-e', '-r', self.section['recipient'] ]
             path += '.gpg'
                 
         path += '.gz'
@@ -63,7 +62,7 @@ class backend():
         sha1sum = [ 'sha1sum' ]
         sed = [ 'sed', 's/-$/%s/' %(os.path.basename(path)) ]
 
-        if self.options.remote:
+        if 'remote' in self.section:
             ssh = self.get_ssh(path, [gzip, tee, sha1sum, sed])
 
             p1 = Popen(cmd, stdout=PIPE)
