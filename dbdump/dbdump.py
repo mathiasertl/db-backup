@@ -22,58 +22,53 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import time, os, sys
+import os, sys, time, argparse
 from libdump import *
-from optparse import OptionParser, OptionGroup
 
-parser = OptionParser(description="Dump databases to a specified directory.", version="%prog 1.0")
-parser.add_option('--backend', action='store',
-    type='string', dest='backend', default='mysql',
+parser = argparse.ArgumentParser(version="%prog 1.0",
+    description="Dump databases to a specified directory.")
+parser.add_argument('--backend', action='store', type=str, dest='backend', default='mysql',
     help="Specify the backend to use. This script currently supports postgresql and mysql.")
-parser.add_option('--datadir', action='store', 
-    type='string', dest='datadir', default='/var/backups/',
+parser.add_argument('--datadir', action='store', type=str, dest='datadir', default='/var/backups/',
     help="Safe the dumps to DATADIR. If used with --remote, DATADIR is a "
-    "directory on the remote machine. (Default: %default)")
-parser.add_option('--su', action='store', dest='su',
+        "directory on the remote machine. (Default: %(default)s)")
+parser.add_argument('--su', action='store', dest='su',
     help="Execute all sql-commands as user SU.")
-parser.add_option('--remote', action='store', dest='remote',
+parser.add_argument('--remote', action='store', dest='remote',
     help='Store dumps remote via SSH. REMOTE will be passed to ssh unchanged.'
     ' Example: "user@backup.example.com"')
-parser.add_option('--sign', action='store', dest='sign_key',
+parser.add_argument('--sign', action='store', dest='sign_key',
     help='Use gpg to sign the dump using the key SIGN_KEY')
-parser.add_option('--encrypt', action='store', dest='recipient',
+parser.add_argument('--encrypt', action='store', dest='recipient',
     help='Use gpg to encrypt the dumps for RECIPIENT.')
 
-group = OptionGroup(parser, "MySQL options",
-    "These options are only available when using --backend=mysql.")
-group.add_option('--defaults', action='store', 
-    type='string', dest='defaults', default='~/.my.cnf',
-    help="Defaults-file to connect to your mysql-server (Default: %default)")
-group.add_option('--ignore-table', action='append', dest="ignore_tables",
+group = parser.add_argument_group(title="MySQL options",
+    description="These options are only available when using --backend=mysql.")
+group.add_argument('--defaults', action='store', 
+    type=str, dest='defaults', default='~/.my.cnf',
+    help="Defaults-file to connect to your mysql-server (Default: %(default)s)")
+group.add_argument('--ignore-table', action='append', dest="ignore_tables",
     metavar='DB_NAME.DB_TABLE', default=[],
     help="""Do not dump the given table. Use multiple times to skip more than
 one table.""")
-parser.add_option_group(group)
 
-group = OptionGroup(parser, "PostgreSQL options",
-    "These options are only available when using --backend=postgresql")
-group.add_option('--psql-options', action='store', dest='psql_opts',
+group = parser.add_argument_group(title="PostgreSQL options",
+    description="These options are only available when using --backend=postgresql")
+group.add_argument('--psql-options', action='store', dest='psql_opts',
     help="PSQL-OPTS will be passed unmodified to psql")
-group.add_option('--pg_dump-options', action='store', dest='pgdump_opts',
+group.add_argument('--pg_dump-options', action='store', dest='pgdump_opts',
     help="PGDUMP_OPTS will be passed unmodified to pg_dump")
-parser.add_option_group(group)
 
-group = OptionGroup(parser, "ejabberd options",
-    "These options are only available when using --backend=ejabberd")
-group.add_option('--node', action="store",
+group = parser.add_argument_group(title="ejabberd options",
+    description="These options are only available when using --backend=ejabberd")
+group.add_argument('--node', action="store",
     help="Dump database from this ejabberd node (optional)")
-group.add_option('--auth', action="store", nargs=3,
+group.add_argument('--auth', action="store", nargs=3,
     metavar="USER HOST PASSWORD",
     help="Authenticate with the erlang node. This specifies a normal "
         "account on the jabber server.")
-group.add_option('--base-dir', action="store", default="/var/lib/ejabberd",
+group.add_argument('--base-dir', action="store", default="/var/lib/ejabberd",
     help="Base directory where the ejabberd database is stored")
-parser.add_option_group(group)
 
 options, args = parser.parse_args()
 
