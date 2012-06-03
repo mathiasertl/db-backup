@@ -22,7 +22,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os, sys, time, argparse
+import os, sys, time, argparse, configparser
 from libdump import *
 
 config_file = ['/etc/dbdump/dbdump.conf', os.path.expanduser('~/.dbdump.conf')]
