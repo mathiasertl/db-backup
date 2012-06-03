@@ -52,7 +52,8 @@ class mysql(backend.backend):
 
     def get_command(self, database):
         # get list of ignored tables:
-        ignored = [ t for t in self.section['ignore-tables'] if t.startswith("%s." % database) ]
+        ignored_tables = self.section['ignore-tables'].split()
+        ignored = [ t for t in ignored_tables if t.startswith("%s." % database) ]
 
         # assemble query for used engines in the database
         engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' AND ENGINE != 'MEMORY'"%database
