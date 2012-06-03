@@ -1,19 +1,26 @@
 [DEFAULT]
-; settings here will override the default behaviour for all sections.
-hourly = 72
-daily = 31
-; see section for what this is for:
-default example = default
-
-[mars]
-datadir = /var/backups/mysql/mars
-
-[pluto]
-datadir = /var/backups/mysql/pluto
-
-[section]
-; you can also use the interpolation feature of python config-files:
-local example = local
-datadir = /var/%(local example)s/%(__name__)s/%(default example)s
-; the above line will evaluate to "/var/local/section/default".
-
+# Lines starting with '#' or ';' are comments.
+# Settings in the [DEFAULT] section sets the default value for all other
+# sections.
+#hourly = 72
+#daily = 31
+#
+# NOTE: You can also use the interpolation feature provided by the
+# 	ConfigParser python module. The following line is used in the
+#	example.net section:
+#datadir = /var/backups/%(backend)s/%(__name__)s
+#
+#[example.com]
+# Clean MySQL dumps from example.com
+#datadir = /var/backups/mysql/example.com/
+#
+#[example.org]
+# Clean MySQL dumps from example.org
+#datadir = /var/backups/mysql/example.org
+#
+#[example.net]
+# Clean PostgreSQL dumps from example.net:
+#backend=postgresql
+# Because of the datadir setting in the [DEFAULT] section, the datadir
+# setting will evaluate to:
+#	/var/backups/postgresql/example.net/

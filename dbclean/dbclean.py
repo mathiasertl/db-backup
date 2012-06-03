@@ -20,169 +20,160 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-	   
+       
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os, time, sys, calendar, configparser
-from optparse import OptionParser
+import os, time, sys, calendar, configparser, argparse
 
+config_file = ['/etc/dbclean/dbclean.conf', os.path.expanduser('~/.dbclean.conf')]
 
-# determine location of (default) config-file. This can still be overridden by
-# the command line.
-config_file = [ '/etc/dbclean/dbclean.conf',
-	os.path.expanduser('~/.dbclean.conf')
-]
+parser = argparse.ArgumentParser(version="%prog 1.0",
+    description = """Cleanup regular database dumps created by dbdump. This script keeps backups
+        at given intervals for a given amount of time.""")
+parser.add_argument('-c', '--config', type=str, dest='config', action='append', default=config_file,
+    help="""Additional config-files to use (default: %(default)s). Can be given multiple times
+        to name multiple config-files.""")
+parser.add_argument('section', action='store', type=str,
+    help="Section in the config-file to use." )
+args = parser.parse_args()
 
-# handle command-line:
-parser = OptionParser( description="Cleanup regular database dumps and keep copies at a certain granularity for a specified time.", version="%prog 1.0" )
-parser.add_option( '--datadir', action='store', type='string', dest='datadir',
-	help="Directory where dumps are stored. Each database is assumed to have its own directory. (Default: /var/backups/<section>)" )
-parser.add_option( '--format', action='store', type='string', dest='timeformat',
-	help="The format the dumps are saved as. See http://docs.python.org/3.0/library/time.html#time.strftime "
-		"for a description of the format. (Default: %Y-%m-%d %H:%M:%S)" )
-parser.add_option( '--config', action='store', type='string', dest='config',
-	help="Location of the config-file (default: /etc/dbclean/dbclean.conf and  ~/.dbclean.conf)." )
-parser.add_option( '--section', action='store', type='string', dest='section',
-	default='DEFAULT', help="Section in the config-file to use (default: %default)" )
+if args.section=='DEFAULT':
+    parser.error("--section must not be 'DEFAULT'.")
 
-(options, args) = parser.parse_args()
+config = configparser.SafeConfigParser({
+    'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
+    'hourly': '24', 'daily': '31',
+    'monthly': '12', 'yearly': '3'
+})
+if not config.read(args.config):
+    parser.error("No config-files could be read.")
 
-# this is a safety-measure: %(__name__)s is a bad substitution if the section is 'DEFAULT':
-if options.section == 'DEFAULT':
-	default_datadir = '/var/backups/DEFAULT'
-else:
-	default_datadir = '/var/backups/%(__name__)s'
+# check validity of config-file:
+if args.section not in config:
+    print("Error: %s: No section found with that name." % args.section, file=sys.stderr)
+    sys.exit(1)
+if 'datadir' not in config[args.section]:
+    print("Error: %s: Section does not contain option 'datadir'." % args.section, file=sys.stderr)
+    sys.exit(1)
 
-# read config-file:
-if options.config != None:
-	config_file = options.config
-config = configparser.SafeConfigParser({ 'datadir': default_datadir,
-	'format': '%%Y-%%m-%%d_%%H:%%M:%%S', 'hourly': '24', 'daily': '31',
-	'monthly': '12', 'yearly': '3' } )
-config.read( config_file )
+# get directory containing backups:
+datadir = config.get(args.section, 'datadir')
 
-# datadir and timeformat may be set via command-line:
-if options.datadir:
-	datadir = options.datadir
-else:
-	datadir = config.get( options.section, 'datadir' )
-if options.timeformat:
-	timeformat = options.timeformat
-else:
-	timeformat = config.get( options.section, 'format' )
+# check that given directory exists and is a directory:
+if not os.path.exists(datadir):
+    print("Error: %s: No such directory." % (datadir), file=sys.stderr)
+    sys.exit(1)
+elif not os.path.isdir(datadir):
+    print("Error: %s: Not a directory." % (datadir), file=sys.stderr)
+    sys.exit(1)
 
-hourly = config.getint( options.section, 'hourly' )
-daily = config.getint( options.section, 'daily' )
-monthly = config.getint( options.section, 'monthly' )
-yearly = config.getint( options.section, 'yearly' )
-
-# some safety-checks
-if not os.path.exists( datadir ):
-	print( "Error: %s: No such directory." % (datadir) )
-elif not os.path.isdir( datadir ):
-	print( "Error: %s: Not a directory." % (datadir) )
+timeformat = config[args.section]['format']
+hourly = int(config[options.section]['hourly'])
+daily = int(config[options.section]['daily'])
+monthly = int(config[options.section]['monthly'])
+yearly = int(config[options.section]['yearly'])
 
 class backup():
-	files = []
+    files = []
 
-	def __init__( self, time, base, file ):
-		self.time = time
-		self.base = base
-		self.files = [ file ]
+    def __init__( self, time, base, file ):
+        self.time = time
+        self.base = base
+        self.files = [ file ]
 
-	def add( self, file ):
-		self.files.append( file )
+    def add( self, file ):
+        self.files.append( file )
 
-	def is_daily( self ):
-		if self.time[3] == 0:
-			return True
-		else:
-			return False
+    def is_daily( self ):
+        if self.time[3] == 0:
+            return True
+        else:
+            return False
 
-	def is_monthly( self ):
-		if self.is_daily() and self.time[2] == 1:
-			return True
-		else:
-			return False
-	
-	def is_yearly( self ):
-		if self.is_monthly() and self.time[1] == 1:
-			return True
-		else:
-			return False
+    def is_monthly( self ):
+        if self.is_daily() and self.time[2] == 1:
+            return True
+        else:
+            return False
+    
+    def is_yearly( self ):
+        if self.is_monthly() and self.time[1] == 1:
+            return True
+        else:
+            return False
 
-	def remove( self ):
-		for file in self.files:
-			os.remove( file )
+    def remove( self ):
+        for file in self.files:
+            os.remove( file )
 
-	def __str__( self ):
-		return "%s in %s" %(self.files, self.base)
+    def __str__( self ):
+        return "%s in %s" %(self.files, self.base)
 
 now = time.time()
 
 # loop through each dir in datadir
 for dir in os.listdir( datadir ):
-	if dir.startswith( '.' ):
-		# skip hidden directories
-		continue
+    if dir.startswith( '.' ):
+        # skip hidden directories
+        continue
 
-	fullpath = os.path.normpath( datadir + '/' + dir )
-	if not os.path.isdir( fullpath ):
-		print( "Warning: %s: Not a directory." % (fullpath) )
-		continue
-	os.chdir( fullpath )
+    fullpath = os.path.normpath( datadir + '/' + dir )
+    if not os.path.isdir( fullpath ):
+        print( "Warning: %s: Not a directory." % (fullpath) )
+        continue
+    os.chdir( fullpath )
 
-	backups = {}
+    backups = {}
 
-	files = os.listdir( '.' )
-	files.sort()
+    files = os.listdir( '.' )
+    files.sort()
 
-	for file in files:
-		filestamp = file.split( '.' )[0]
-		timestamp = ''
-		try:
-			timestamp = time.strptime( filestamp, timeformat )
-		except ValueError as e:
-			print( '%s: %s' %(file, e) )
-		
-		if timestamp not in list( backups.keys() ):
-			backups[timestamp] = backup( timestamp, fullpath, file )
-		else:
-			backups[timestamp].add( file )
+    for file in files:
+        filestamp = file.split( '.' )[0]
+        timestamp = ''
+        try:
+            timestamp = time.strptime( filestamp, timeformat )
+        except ValueError as e:
+            print( '%s: %s' %(file, e) )
+        
+        if timestamp not in list( backups.keys() ):
+            backups[timestamp] = backup( timestamp, fullpath, file )
+        else:
+            backups[timestamp].add( file )
 
 
-	for stamp in list(backups.keys()):
-		bck = backups[stamp]
-		bck_seconds = calendar.timegm( stamp )
+    for stamp in list(backups.keys()):
+        bck = backups[stamp]
+        bck_seconds = calendar.timegm( stamp )
 
-		if bck_seconds > now - ( hourly * 3600 ):
-#			print ( "%s is hourly and will be kept" % ( time.asctime( stamp ) ) )
-			continue
-#		else:
-#			print ("%s is hourly but to old." % ( time.asctime( stamp ) ) )
+        if bck_seconds > now - ( hourly * 3600 ):
+#            print ( "%s is hourly and will be kept" % ( time.asctime( stamp ) ) )
+            continue
+#        else:
+#            print ("%s is hourly but to old." % ( time.asctime( stamp ) ) )
 
-		if bck.is_daily():
-			if bck_seconds > now - ( daily * 86400 ):
-#				print( "%s is daily and will be kept." % ( time.asctime( stamp ) ) )
-				continue
-#			else:
-#				print ("%s is daily but to old." % ( time.asctime( stamp ) ) )
+        if bck.is_daily():
+            if bck_seconds > now - ( daily * 86400 ):
+#                print( "%s is daily and will be kept." % ( time.asctime( stamp ) ) )
+                continue
+#            else:
+#                print ("%s is daily but to old." % ( time.asctime( stamp ) ) )
 
-		if bck.is_monthly():
-			if bck_seconds > now - ( monthly * 2678400 ):
-#				print( "%s is monthly and will be kept." % ( time.asctime( stamp ) ) )
-				continue
-#			else:
-#				print ("%s is monthly but to old." % ( time.asctime( stamp ) ) )
-		
-		if bck.is_yearly():
-			if bck_seconds > now - ( yearly * 31622400 ):
-#				print( "%s is yearly and will be kept." % ( time.asctime( stamp ) ) )
-				continue
-#			else:
-#				print ("%s is yearly but to old." % ( time.asctime( stamp ) ) )
-#		print( "%s will be removed." % ( time.asctime( stamp ) ) )
+        if bck.is_monthly():
+            if bck_seconds > now - ( monthly * 2678400 ):
+#                print( "%s is monthly and will be kept." % ( time.asctime( stamp ) ) )
+                continue
+#            else:
+#                print ("%s is monthly but to old." % ( time.asctime( stamp ) ) )
+        
+        if bck.is_yearly():
+            if bck_seconds > now - ( yearly * 31622400 ):
+#                print( "%s is yearly and will be kept." % ( time.asctime( stamp ) ) )
+                continue
+#            else:
+#                print ("%s is yearly but to old." % ( time.asctime( stamp ) ) )
+#        print( "%s will be removed." % ( time.asctime( stamp ) ) )
 
-		bck.remove()
+        bck.remove()
