@@ -25,8 +25,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os, sys, time, argparse
 from libdump import *
 
+config_file = ['/etc/dbdump/dbdump.conf', os.path.expanduser('~/.dbdump.conf')]
+
 parser = argparse.ArgumentParser(version="%prog 1.0",
     description="Dump databases to a specified directory.")
+parser.add_argument('-c', '--config', type=str, dest='config', action='append', default=config_file,
+    help="""Additional config-files to use (default: %(default)s). Can be given multiple times
+        to name multiple config-files.""")
+parser.add_argument('section', action='store', type=str,
+    help="Section in the config-file to use." )
+args = parser.parse_args()
+
+# old options:
+"""
 parser.add_argument('--backend', action='store', default='mysql',
     help="Specify the backend to use. This script currently supports postgresql and mysql.")
 parser.add_argument('--datadir', action='store', default='/var/backups/',
@@ -65,35 +76,56 @@ group.add_argument('--auth', action="store", nargs=3, metavar=('USER', 'HOST', '
     help="Authenticate with the erlang node. This specifies a normal account on the jabber server.")
 group.add_argument('--base-dir', action="store", default="/var/lib/ejabberd",
     help="Base directory where the ejabberd database is stored")
+"""
 
 args = parser.parse_args()
 
-if not args.remote:
-    # Note that if we are remote there is no real way to check to check if
-    # base exists and is writeable. We rely on the competence of the admin
-    # in that case.
-    base = args.datadir
-    if not os.path.exists(base):
-        print("Error: " + base + ": Does not exist.", sys.stderr)
+if args.section=='DEFAULT':
+    parser.error("--section must not be 'DEFAULT'.")
+    
+config = configparser.SafeConfigParser({
+    'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
+})
+if not config.read(args.config):
+    parser.error("No config-files could be read.")
+    
+# check validity of config-file:
+if args.section not in config:
+    print("Error: %s: No section found with that name." % args.section, file=sys.stderr)
+    sys.exit(1)
+if 'datadir' not in config[args.section]:
+    print("Error: %s: Section does not contain option 'datadir'." % args.section, file=sys.stderr)
+    sys.exit(1)
+    
+section = config[args.section]
+
+if 'remote' not in section:
+    # Note that if we dump to a remote location, there is no real way to check to check if datadir
+    # exists and is writeable. We have to rely on the competence of the admin in that case.
+    datadir = section['datadir']
+    if not os.path.exists(datadir):
+        print("Error: %s: Does not exist." % datadir, sys.stderr)
         sys.exit(1)
-    elif not os.path.isdir( base):
-        print("Error: " + base + ": Not a directory.", sys.stderr)
+    elif not os.path.isdir(datadir):
+        print("Error: %s: Not a directory." % datadir, sys.stderr)
         sys.exit(1)
     elif not os.access( base, (os.R_OK | os.W_OK | os.X_OK)):
-        print("Error: " + base + ": Permission denied.", sys.stderr)
+        print("Error: %s: Permission denied." % datadir, sys.stderr)
         sys.exit(1)
 
-if args.backend == "mysql":
+if section['backend'] == "mysql":
     backend = mysql.mysql(args)
-elif args.backend == "postgresql":
+elif section['backend'] == "postgresql":
     backend = postgresql.postgresql(args)
-elif args.backend == "ejabberd":
+elif section['backend'] == "ejabberd":
     backend = ejabberd.ejabberd(args)
 else:
-    parser.error("Unknown backend specified. This script only supports mysql and postgresql.")
+    print("Error: %s. Unknown backend specified. Only mysql, postgresql and ejabberd are supported."
+        % section['backend'], file=sys.stderr)
+    sys.exit(1)
 
 databases = backend.get_db_list()
-timestamp = time.strftime('%Y-%m-%d_%H:%M:%S', time.gmtime())
+timestamp = time.strftime(section['format'], time.gmtime())
 
 # finally: loop through the databases and dump them:
 backend.prepare()
