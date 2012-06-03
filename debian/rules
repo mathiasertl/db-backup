@@ -24,3 +24,6 @@ override_dh_install: ${PYVERS:%=install-python%}
 	
 	rename 's/.py//' debian/dbdump/usr/bin/*.py
 	rename 's/.py//' debian/dbclean/usr/bin/*.py
+	
+	rename 's/.example//' debian/dbclean/etc/dbclean/*.example
+	rename 's/.example//' debian/dbdump/etc/dbdump/*.example

@@ -1,1 +1,2 @@
 dbdump/dbdump.py /usr/bin
+dbdump/dbdump.conf.example /etc/dbdump

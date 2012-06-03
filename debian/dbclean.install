@@ -1,2 +1,2 @@
 dbclean/dbclean.py /usr/bin
-debian/dbclean.conf /etc/dbclean/
+dbclean/dbclean.conf.example /etc/dbclean/
