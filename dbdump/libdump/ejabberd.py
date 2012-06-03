@@ -14,7 +14,7 @@ class ejabberd(backend.backend):
         if 'node' in self.section:
             cmd += [ '--node', self.section['node'] ]
         if 'auth' in self.section:
-            cmd += ['--auth', self.section['auth']]
+            cmd += ['--auth', self.section['auth'].split()]
 
         cmd += [ 'backup', database + '.backup' ]
         p = subprocess.Popen(cmd)
