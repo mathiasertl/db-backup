@@ -29,9 +29,11 @@ config_file = ['/etc/dbdump/dbdump.conf', os.path.expanduser('~/.dbdump.conf')]
 
 parser = argparse.ArgumentParser(version="%prog 1.0",
     description="Dump databases to a specified directory.")
-parser.add_argument('-c', '--config', type=str, dest='config', action='append', default=config_file,
+parser.add_argument('-c', '--config', action='append', default=config_file,
     help="""Additional config-files to use (default: %(default)s). Can be given multiple times
         to name multiple config-files.""")
+parser.add_argument('-v', '--verbose', action='store_true', default=False,
+    help="Print all called commands to stdout.")
 parser.add_argument('section', action='store', type=str,
     help="Section in the config-file to use." )
 args = parser.parse_args()
@@ -70,11 +72,11 @@ if 'remote' not in section:
         sys.exit(1)
 
 if section['backend'] == "mysql":
-    backend = mysql.mysql(args)
+    backend = mysql.mysql(section, args)
 elif section['backend'] == "postgresql":
-    backend = postgresql.postgresql(args)
+    backend = postgresql.postgresql(section, args)
 elif section['backend'] == "ejabberd":
-    backend = ejabberd.ejabberd(args)
+    backend = ejabberd.ejabberd(section, args)
 else:
     print("Error: %s. Unknown backend specified. Only mysql, postgresql and ejabberd are supported."
         % section['backend'], file=sys.stderr)

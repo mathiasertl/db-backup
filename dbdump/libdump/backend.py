@@ -21,7 +21,8 @@ import os, time
 from subprocess import *
 
 class backend():
-    def __init__(self, section):
+    def __init__(self, section, args):
+        self.args = args
         self.section = section
         self.base = section['datadir']
         if 'sign-key' in section or 'recipient' in section:
