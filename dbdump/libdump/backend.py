@@ -82,14 +82,20 @@ class backend():
                 os.mkdir(dirname, 0o700)
 
             f = open(path + '.sha1', 'w')
+            cmds = [cmd]
             p1 = Popen(cmd, stdout=PIPE)
             p = p1
             if self.gpg:
                 p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
+                cmds.append(gpg)
             p2 = Popen(gzip, stdin=p1.stdout, stdout=PIPE)
             p3 = Popen(tee, stdin=p2.stdout, stdout=PIPE)
             p4 = Popen(sha1sum, stdin=p3.stdout, stdout=PIPE)
             p5 = Popen(sed, stdin=p4.stdout, stdout=f)
+            cmds += [p2, p3, p4, p5]
+            if self.args.verbose:
+                str_cmds = [ ' '.join(cmd) for cmd in cmds]
+                print('%s # dump databases!' % ' | '.join(str_cmds))
             p5.communicate()
             f.close()
     

@@ -17,9 +17,13 @@ class ejabberd(backend.backend):
             cmd += ['--auth', self.section['ejabberd-auth'].split()]
 
         cmd += [ 'backup', database + '.backup' ]
+        if self.args.verbose:
+            print('%s # prepare db' % ' '.join(cmd))
         p = subprocess.Popen(cmd)
         p.communicate()
 
     def cleanup_db(self, database):
         path = os.path.normpath(self.section['ejabberd-base-dir'] + '/' + database + '.backup')
+        if self.args.verbose:
+            print('rm %s # remove local dump' % path)
         os.remove(path)

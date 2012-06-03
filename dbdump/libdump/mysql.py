@@ -39,6 +39,8 @@ class mysql(backend.backend):
         excluded = ['information_schema', 'performance_schema']
         cmd = ['/usr/bin/mysql', '--defaults-file=' + self.section['mysql-defaults'],
                '--execute=SHOW DATABASES', '-B', '-s']
+        if self.args.verbose:
+            print('%s # get list of databases' % ' '.join(cmd))
         p_list = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p_list.communicate()
         databases = stdout.decode().strip("\n").split("\n")
@@ -66,6 +68,8 @@ class mysql(backend.backend):
             engine_cmd.append('--defaults-file=%s' % self.section['mysql-defaults'])
         engine_cmd += [ '-NB', "--execute=%s" % engine_query ]
         
+        if self.args.verbose:
+            print('%s # get list of database engines' % ' '.join(engine_cmd))
         p = Popen(engine_cmd, stdout=PIPE)
         types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
