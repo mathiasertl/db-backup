@@ -74,13 +74,13 @@ if not args.remote:
     # in that case.
     base = args.datadir
     if not os.path.exists(base):
-        print("Error: " + base + ": Does not exist.")
+        print("Error: " + base + ": Does not exist.", sys.stderr)
         sys.exit(1)
     elif not os.path.isdir( base):
-        print("Error: " + base + ": Not a directory.")
+        print("Error: " + base + ": Not a directory.", sys.stderr)
         sys.exit(1)
     elif not os.access( base, (os.R_OK | os.W_OK | os.X_OK)):
-        print("Error: " + base + ": Permission denied.")
+        print("Error: " + base + ": Permission denied.", sys.stderr)
         sys.exit(1)
 
 if args.backend == "mysql":
