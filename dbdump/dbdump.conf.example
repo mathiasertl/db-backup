@@ -72,11 +72,11 @@
 # EJABBERD OPTIONS:
 #
 # Dump database from this ejabberd node (optional):
-#node = ejabberd
+#ejabberd-node = ejabberd
 #
 # Authenticate with the erlang node. This specifies a normal account on
 # the jabber server (optional):
-#auth = user jabber.example.com password
+#ejabberd-auth = user jabber.example.com password
 #
 # Base directory where the ejabberd database is stored:
-#base-dir = /var/lib/ejabberd"
+#ejabberd-base-dir = /var/lib/ejabberd
