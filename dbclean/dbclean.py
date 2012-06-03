@@ -30,8 +30,8 @@ import os, time, sys, calendar, configparser, argparse
 config_file = ['/etc/dbclean/dbclean.conf', os.path.expanduser('~/.dbclean.conf')]
 
 parser = argparse.ArgumentParser(version="%prog 1.0",
-    description = """Cleanup regular database dumps and keep copies at a certain granularity for
-    a specified time.""")
+    description = """Cleanup regular database dumps created by dbdump. This script keeps backups
+        at given intervals for a given amount of time.""")
 parser.add_argument('-c', '--config', type=str, dest='config', action='append', default=config_file,
     help="""Additional config-files to use (default: %(default)s). Can be given multiple times
         to name multiple config-files.""")
@@ -39,9 +39,8 @@ parser.add_argument('section', action='store', type=str,
     help="Section in the config-file to use." )
 args = parser.parse_args()
 
-if not args.section or args.section=='DEFAULT':
-    print("Error: --section is a mandatory argument.", file=sys.stderr)
-    sys.exit(1)
+if args.section=='DEFAULT':
+    parser.error("--section must not be 'DEFAULT'.")
 
 config = configparser.SafeConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
@@ -49,8 +48,7 @@ config = configparser.SafeConfigParser({
     'monthly': '12', 'yearly': '3'
 })
 if not config.read(args.config):
-    print("Error: No config-files could be read.", file=sys.stderr)
-    sys.exit(1)
+    parser.error("No config-files could be read.")
 
 # check validity of config-file:
 if not config.has_section(args.section):
