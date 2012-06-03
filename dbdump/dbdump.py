@@ -36,50 +36,6 @@ parser.add_argument('section', action='store', type=str,
     help="Section in the config-file to use." )
 args = parser.parse_args()
 
-# old options:
-"""
-parser.add_argument('--backend', action='store', default='mysql',
-    help="Specify the backend to use. This script currently supports postgresql and mysql.")
-parser.add_argument('--datadir', action='store', default='/var/backups/',
-    help="Safe the dumps to DATADIR. If used with --remote, DATADIR is a "
-        "directory on the remote machine. (Default: %(default)s)")
-parser.add_argument('--su', action='store',
-    help="Execute all sql-commands as user SU.")
-parser.add_argument('--remote', action='store',
-    help='Store dumps remote via SSH. REMOTE will be passed to ssh unchanged.'
-    ' Example: "user@backup.example.com"')
-parser.add_argument('--sign', action='store', dest='sign_key',
-    help='Use gpg to sign the dump using the key SIGN_KEY')
-parser.add_argument('--encrypt', action='store', dest='recipient',
-    help='Use gpg to encrypt the dumps for RECIPIENT.')
-
-group = parser.add_argument_group(title="MySQL options",
-    description="These options are only available when using --backend=mysql.")
-group.add_argument('--defaults', action='store', default='~/.my.cnf',
-    help="Defaults-file to connect to your mysql-server (Default: %(default)s)")
-group.add_argument('--ignore-table', action='append', dest="ignore_tables",
-    metavar='DB_NAME.DB_TABLE', default=[],
-    help='Do not dump the given table. Use multiple times to skip more than one table.')
-
-group = parser.add_argument_group(title="PostgreSQL options",
-    description="These options are only available when using --backend=postgresql")
-group.add_argument('--psql-options', action='store', dest='psql_opts',
-    help="PSQL-OPTS will be passed unmodified to psql")
-group.add_argument('--pg_dump-options', action='store', dest='pgdump_opts',
-    help="PGDUMP_OPTS will be passed unmodified to pg_dump")
-
-group = parser.add_argument_group(title="ejabberd options",
-    description="These options are only available when using --backend=ejabberd")
-group.add_argument('--node', action="store",
-    help="Dump database from this ejabberd node (optional)")
-group.add_argument('--auth', action="store", nargs=3, metavar=('USER', 'HOST', 'PASSWORD',),
-    help="Authenticate with the erlang node. This specifies a normal account on the jabber server.")
-group.add_argument('--base-dir', action="store", default="/var/lib/ejabberd",
-    help="Base directory where the ejabberd database is stored")
-"""
-
-args = parser.parse_args()
-
 if args.section=='DEFAULT':
     parser.error("--section must not be 'DEFAULT'.")
     
