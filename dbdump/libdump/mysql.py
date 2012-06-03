@@ -74,7 +74,7 @@ class mysql(backend.backend):
         types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
         cmd = [ 'mysqldump' ]
-        if self.options.defaults:
+        if 'defaults' in self.section:
             cmd.append('--defaults-file=%s' % self.section['mysql-defaults'])
 
         for table in ignored:
