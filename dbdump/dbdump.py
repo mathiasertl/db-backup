@@ -45,6 +45,7 @@ config = configparser.SafeConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
     'datadir': '/var/backups/%(backend)s',
     'mysql-defaults': '~/.my.cnf',
+    'mysql-ignore-tables': '',
     'ejabberd-base-dir': '/var/lib/ejabberd',
 })
 if not config.read(args.config):
