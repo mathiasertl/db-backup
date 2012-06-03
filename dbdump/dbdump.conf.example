@@ -7,11 +7,14 @@
 #
 # SETTINGS COMMON TO ALL DATABASE BACKENDS:
 #
-# The base directory to dump your databases to:
-#datadir=/var/backups
-#
-# The backend to use. Either mysql, postgresql or ejabberd are supported:
+# The backend to use. Either mysql, postgresql or ejabberd are supported.
+# Note that the default is the section name, if you do not explicitly set
+# this in this file.
 #backend=mysql
+#
+# The base directory to dump your databases to.
+# Default is /var/backups/<backend>
+#datadir=/var/backups/mysql
 #
 # Use su to drop privileges to the specified user for all SQL related
 # commands (optional):
@@ -46,7 +49,7 @@
 # MYSQL OPTIONS:
 #
 # Use a custom defaults-file. This file should be used to specify access
-# credentials:
+# credentials (default given here):
 #mysql-defaults = ~/.my.cnf
 #
 # Ignore given tables when dumping. This can be useful if a certain
@@ -78,5 +81,6 @@
 # the jabber server (optional):
 #ejabberd-auth = user jabber.example.com password
 #
-# Base directory where the ejabberd database is stored:
+# Base directory where the ejabberd database is stored (default given
+# here):
 #ejabberd-base-dir = /var/lib/ejabberd
