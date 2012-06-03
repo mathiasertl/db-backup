@@ -32,7 +32,7 @@ parser = argparse.ArgumentParser(version="%prog 1.0",
 parser.add_argument('-c', '--config', action='append', default=config_file,
     help="""Additional config-files to use (default: %(default)s). Can be given multiple times
         to name multiple config-files.""")
-parser.add_argument('-v', '--verbose', action='store_true', default=False,
+parser.add_argument('--verbose', action='store_true', default=False,
     help="Print all called commands to stdout.")
 parser.add_argument('section', action='store', type=str,
     help="Section in the config-file to use." )
