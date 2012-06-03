@@ -51,10 +51,10 @@ if not config.read(args.config):
     parser.error("No config-files could be read.")
 
 # check validity of config-file:
-if not config.has_section(args.section):
+if args.section not in config:
     print("Error: %s: No section found with that name." % args.section, file=sys.stderr)
     sys.exit(1)
-if not config.has_option(args.section, 'datadir'):
+if 'datadir' not in config[args.section]:
     print("Error: %s: Section does not contain option 'datadir'." % args.section, file=sys.stderr)
     sys.exit(1)
 
@@ -69,11 +69,11 @@ elif not os.path.isdir(datadir):
     print("Error: %s: Not a directory." % (datadir), file=sys.stderr)
     sys.exit(1)
 
-timeformat = config.get(args.section, 'format')
-hourly = config.getint(options.section, 'hourly')
-daily = config.getint(options.section, 'daily')
-monthly = config.getint(options.section, 'monthly')
-yearly = config.getint(options.section, 'yearly')
+timeformat = config[args.section]['format']
+hourly = int(config[options.section]['hourly'])
+daily = int(config[options.section]['daily'])
+monthly = int(config[options.section]['monthly'])
+yearly = int(config[options.section]['yearly'])
 
 class backup():
     files = []
