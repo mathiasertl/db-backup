@@ -24,10 +24,10 @@ class postgresql(backend.backend):
     def get_db_list(self):
         cmd = [ 'psql', '-Aqt', '-c', '"select datname from pg_database"' ]
 
-        if self.options.psql_opts:
-            cmd += self.options.psql_opts.split(' ')
+        if 'psql_opts' in self.section:
+            cmd += self.section['psql_opts'].split(' ')
 
-        if self.options.su:
+        if 'su' in self.section:
             cmd = [ 'su', 'postgres', '-s', '/bin/bash', '-c', ' '.join(cmd) ]
 
         p_list = Popen(cmd, stdout=PIPE, stderr=PIPE)
@@ -43,8 +43,8 @@ class postgresql(backend.backend):
 
     def get_command(self, database):
         cmd = [ 'pg_dump', '-c' ]
-        if self.options.pgdump_opts:
-            cmd += self.options.pgdump_opts.split(' ')
+        if 'pgdump_opts' in self.section:
+            cmd += self.section['pgdump_opts'].split(' ')
         cmd.append(database)
         return cmd
 
