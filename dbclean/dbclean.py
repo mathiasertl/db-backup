@@ -48,7 +48,9 @@ config = configparser.SafeConfigParser({
     'hourly': '24', 'daily': '31',
     'monthly': '12', 'yearly': '3'
 })
-config.read(args.config)
+if not config.read(args.config):
+    print("Error: No config-files could be read.", file=sys.stderr)
+    sys.exit(1)
 
 # check validity of config-file:
 if not config.has_section(args.section):
