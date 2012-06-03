@@ -68,13 +68,13 @@ group.add_argument('--auth', action="store", nargs=3, metavar="USER HOST PASSWOR
 group.add_argument('--base-dir', action="store", default="/var/lib/ejabberd",
     help="Base directory where the ejabberd database is stored")
 
-options, args = parser.parse_args()
+args = parser.parse_args()
 
-if not options.remote:
+if not args.remote:
     # Note that if we are remote there is no real way to check to check if
     # base exists and is writeable. We rely on the competence of the admin
     # in that case.
-    base = options.datadir
+    base = args.datadir
     if not os.path.exists(base):
         print("Error: " + base + ": Does not exist.")
         sys.exit(1)
@@ -85,12 +85,12 @@ if not options.remote:
         print("Error: " + base + ": Permission denied.")
         sys.exit(1)
 
-if options.backend == "mysql":
-    backend = mysql.mysql(options)
-elif options.backend == "postgresql":
-    backend = postgresql.postgresql(options)
-elif options.backend == "ejabberd":
-    backend = ejabberd.ejabberd(options)
+if args.backend == "mysql":
+    backend = mysql.mysql(args)
+elif args.backend == "postgresql":
+    backend = postgresql.postgresql(args)
+elif args.backend == "ejabberd":
+    backend = ejabberd.ejabberd(args)
 else:
     parser.error("Unknown backend specified. This script only supports mysql and postgresql.")
 
