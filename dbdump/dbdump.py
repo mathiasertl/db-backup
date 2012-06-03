@@ -48,8 +48,7 @@ group.add_argument('--defaults', action='store', default='~/.my.cnf',
     help="Defaults-file to connect to your mysql-server (Default: %(default)s)")
 group.add_argument('--ignore-table', action='append', dest="ignore_tables",
     metavar='DB_NAME.DB_TABLE', default=[],
-    help="""Do not dump the given table. Use multiple times to skip more than
-        one table.""")
+    help='Do not dump the given table. Use multiple times to skip more than one table.')
 
 group = parser.add_argument_group(title="PostgreSQL options",
     description="These options are only available when using --backend=postgresql")
@@ -62,9 +61,8 @@ group = parser.add_argument_group(title="ejabberd options",
     description="These options are only available when using --backend=ejabberd")
 group.add_argument('--node', action="store",
     help="Dump database from this ejabberd node (optional)")
-group.add_argument('--auth', action="store", nargs=3, metavar="USER HOST PASSWORD",
-    help="Authenticate with the erlang node. This specifies a normal "
-        "account on the jabber server.")
+group.add_argument('--auth', action="store", nargs=3, metavar=('USER', 'HOST', 'PASSWORD',),
+    help="Authenticate with the erlang node. This specifies a normal account on the jabber server.")
 group.add_argument('--base-dir', action="store", default="/var/lib/ejabberd",
     help="Base directory where the ejabberd database is stored")
 
