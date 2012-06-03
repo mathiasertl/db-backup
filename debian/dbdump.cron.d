@@ -1,6 +1,5 @@
-# backup MySQL databases to a local directory:
-#10 *	* * * 	root	dbdump --backend=mysql --datadir=/backup/mysql/
+# Do backups as specified in the 'mysql' section:
+#10 *	* * * 	root	dbdump --section=mysql
 
-# backup PostgreSQL databases to a remote location. Dumps are signed and
-# encrypted using GPG:
-#0  *	* * *	root 	dbdump --backend=postgresql --datadir=/backup/postgres/mars --su=postgres --remote=backup-postgres-mars@backup.example.com --sign=root@example.com --encrypt=backup
+# Do backups as specified in the 'postgresql' section:
+#0  *	* * *	root 	dbdump --section=postgresql
