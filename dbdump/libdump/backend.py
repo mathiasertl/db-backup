@@ -24,7 +24,7 @@ class backend():
     def __init__(self, section):
         self.section = section
         self.base = section['datadir']
-        if 'sign_key' in section or 'recipient' in section:
+        if 'sign-key' in section or 'recipient' in section:
             self.gpg = True
         else:
             self.gpg = False
@@ -50,7 +50,7 @@ class backend():
         if self.gpg:
             gpg = [ 'gpg' ]
             if 'sign_key' in self.section:
-                gpg += [ '-s', '-u', self.section['sign_key'] ]
+                gpg += [ '-s', '-u', self.section['sign-key'] ]
             if 'recipient' in self.section:
                 gpg += [ '-e', '-r', self.section['recipient'] ]
             path += '.gpg'
