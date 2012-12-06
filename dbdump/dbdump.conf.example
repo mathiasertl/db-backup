@@ -22,7 +22,7 @@
 #
 # Store dumps on a remote location via SSH. REMOTE will be passed to ssh
 # unchanged (optional):
-#ssh = user@backup.example.com
+remote = user@backup.example.com
 #
 # Sign and/or encrypt backups using the specified GPG keys (optional):
 #sign-key = dbdump@hostname.example.net

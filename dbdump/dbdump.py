@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
 """
-This program is designed to regulary dump SQL databases into a 
+This program is designed to regulary dump SQL databases into a
 specified directory for backup purposes. Please see the README file
 for how to use this script and supported features. You might also
 try calling this program with '--help'.
 
-Copyright 2009, 2010 Mathias Ertl
+Copyright 2009-2012 Mathias Ertl
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ args = parser.parse_args()
 
 if args.section=='DEFAULT':
     parser.error("--section must not be 'DEFAULT'.")
-    
+
 config = configparser.SafeConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
     'datadir': '/var/backups/%(backend)s',
@@ -50,7 +50,7 @@ config = configparser.SafeConfigParser({
 })
 if not config.read(args.config):
     parser.error("No config-files could be read.")
-    
+
 # check validity of config-file:
 if args.section not in config:
     print("Error: %s: No section found with that name." % args.section, file=sys.stderr)
@@ -58,7 +58,7 @@ if args.section not in config:
 if 'datadir' not in config[args.section]:
     print("Error: %s: Section does not contain option 'datadir'." % args.section, file=sys.stderr)
     sys.exit(1)
-    
+
 section = config[args.section]
 
 if 'remote' not in section:
@@ -71,7 +71,7 @@ if 'remote' not in section:
     elif not os.path.isdir(datadir):
         print("Error: %s: Not a directory." % datadir, sys.stderr)
         sys.exit(1)
-    elif not os.access( base, (os.R_OK | os.W_OK | os.X_OK)):
+    elif not os.access(datadir, (os.R_OK | os.W_OK | os.X_OK)):
         print("Error: %s: Permission denied." % datadir, sys.stderr)
         sys.exit(1)
 

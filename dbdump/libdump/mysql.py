@@ -1,7 +1,7 @@
 """
 This file is part of dbdump.
 
-Copyright 2009, 2010 Mathias Ertl
+Copyright 2009-2012 Mathias Ertl
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,22 +22,30 @@ from subprocess import *
 import os, sys, stat
 
 class mysql(backend.backend):
+
+    @property
+    def defaults(self):
+        if 'mysql-defaults' in self.section:
+            return os.path.expanduser(self.section['mysql-defaults'])
+        if os.getuid() == 0 and os.path.exists('/etc/mysql/debian.cnf'):
+            return '/etc/mysql/debian.cnf'
+        return os.path.expanduser('~/.my.cnf')
+
     def prepare(self):
-        defaults = os.path.expanduser(self.section['mysql-defaults'])
-        if not os.path.exists(defaults):
-            print("Error: %s: Does not exist." % defaults, file=sys.stderr)
+        if self.defaults and not os.path.exists(self.defaults):
+            print("Error: %s: Does not exist." % self.defaults, file=sys.stderr)
             sys.exit(1)
         unsafe = stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP
         unsafe |= stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
 
-        mode = os.stat(defaults)[stat.ST_MODE]
+        mode = os.stat(self.defaults)[stat.ST_MODE]
         if mode & unsafe != 0:
             print("Warning: %s: unsafe permissions (fix with 'chmod go-rwx %s')"
-                  % (defaults, defaults), file=sys.stderr)
+                  % (self.defaults, self.defaults), file=sys.stderr)
 
     def get_db_list(self):
         excluded = ['information_schema', 'performance_schema']
-        cmd = ['/usr/bin/mysql', '--defaults-file=' + self.section['mysql-defaults'],
+        cmd = ['/usr/bin/mysql', '--defaults-file=%s' % self.defaults,
                '--execute=SHOW DATABASES', '-B', '-s']
         if self.args.verbose:
             print('%s # get list of databases' % ' '.join(cmd))
@@ -64,18 +72,18 @@ class mysql(backend.backend):
         engine_query += ' GROUP BY ENGINE'
 
         engine_cmd = [ 'mysql' ]
-        if self.section['mysql-defaults']:
-            engine_cmd.append('--defaults-file=%s' % self.section['mysql-defaults'])
+        if self.defaults:
+            engine_cmd.append('--defaults-file=%s' % self.defaults)
         engine_cmd += [ '-NB', "--execute=%s" % engine_query ]
-        
+
         if self.args.verbose:
             print('%s # get list of database engines' % ' '.join(engine_cmd))
         p = Popen(engine_cmd, stdout=PIPE)
         types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
         cmd = [ 'mysqldump' ]
-        if 'defaults' in self.section:
-            cmd.append('--defaults-file=%s' % self.section['mysql-defaults'])
+        if self.defaults:
+            cmd.append('--defaults-file=%s' % self.defaults)
 
         for table in ignored:
             cmd.append('--ignore-table="%s"' % table)
