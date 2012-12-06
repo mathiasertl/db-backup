@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os, time
 from subprocess import *
 
-class backend():
+class backend(object):
     def __init__(self, section, args):
         self.args = args
         self.section = section
@@ -55,7 +55,7 @@ class backend():
             if 'recipient' in self.section:
                 gpg += [ '-e', '-r', self.section['recipient'] ]
             path += '.gpg'
-                
+
         path += '.gz'
 
         gzip = [ 'gzip', '-f', '-9', '-', '-' ]
@@ -77,7 +77,7 @@ class backend():
                 raise RuntimeError("SSH returned with exit code 255.")
             elif p2.returncode != 0:
                 raise RuntimeError("%s returned with exit code %s."%(ssh, p2.returncode))
-        else:   
+        else:
             if not os.path.exists(dirname):
                 os.mkdir(dirname, 0o700)
 
@@ -98,7 +98,7 @@ class backend():
                 print('%s # dump databases!' % ' | '.join(str_cmds))
             p5.communicate()
             f.close()
-    
+
     def prepare(self):
         pass
 
