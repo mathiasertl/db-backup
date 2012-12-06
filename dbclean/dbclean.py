@@ -20,7 +20,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-       
+
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
@@ -70,10 +70,10 @@ elif not os.path.isdir(datadir):
     sys.exit(1)
 
 timeformat = config[args.section]['format']
-hourly = int(config[options.section]['hourly'])
-daily = int(config[options.section]['daily'])
-monthly = int(config[options.section]['monthly'])
-yearly = int(config[options.section]['yearly'])
+hourly = int(config[args.section]['hourly'])
+daily = int(config[args.section]['daily'])
+monthly = int(config[args.section]['monthly'])
+yearly = int(config[args.section]['yearly'])
 
 class backup():
     files = []
@@ -97,7 +97,7 @@ class backup():
             return True
         else:
             return False
-    
+
     def is_yearly( self ):
         if self.is_monthly() and self.time[1] == 1:
             return True
@@ -137,7 +137,7 @@ for dir in os.listdir( datadir ):
             timestamp = time.strptime( filestamp, timeformat )
         except ValueError as e:
             print( '%s: %s' %(file, e) )
-        
+
         if timestamp not in list( backups.keys() ):
             backups[timestamp] = backup( timestamp, fullpath, file )
         else:
@@ -167,7 +167,7 @@ for dir in os.listdir( datadir ):
                 continue
 #            else:
 #                print ("%s is monthly but to old." % ( time.asctime( stamp ) ) )
-        
+
         if bck.is_yearly():
             if bck_seconds > now - ( yearly * 31622400 ):
 #                print( "%s is yearly and will be kept." % ( time.asctime( stamp ) ) )
