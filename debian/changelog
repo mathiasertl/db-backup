@@ -1,5 +1,11 @@
 db-backup (2012-12-06-1) precise; urgency=low
 
+  * minor fixes
+
+ -- Mathias Ertl <apt-repository@fsinf.at>  Thu, 06 Dec 2012 21:36:23 +0100
+
+db-backup (2012-12-06-1) precise; urgency=low
+
   * Various updates
 
  -- Mathias Ertl <apt-repository@fsinf.at>  Thu, 06 Dec 2012 21:08:23 +0100
