@@ -27,8 +27,8 @@ from libdump import *
 
 config_file = ['/etc/dbdump/dbdump.conf', os.path.expanduser('~/.dbdump.conf')]
 
-parser = argparse.ArgumentParser(version="%prog 1.0",
-    description="Dump databases to a specified directory.")
+parser = argparse.ArgumentParser(description="Dump databases to a specified directory.")
+parser.add_argument('--version', action='version', version="%(prog)s 1.0")
 parser.add_argument('-c', '--config', action='append', default=config_file,
     help="""Additional config-files to use (default: %(default)s). Can be given multiple times
         to name multiple config-files.""")
@@ -44,7 +44,6 @@ if args.section=='DEFAULT':
 config = configparser.SafeConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
     'datadir': '/var/backups/%(backend)s',
-    'mysql-defaults': '~/.my.cnf',
     'mysql-ignore-tables': '',
     'ejabberd-base-dir': '/var/lib/ejabberd',
 })

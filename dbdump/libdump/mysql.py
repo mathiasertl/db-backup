@@ -44,7 +44,7 @@ class mysql(backend.backend):
                   % (self.defaults, self.defaults), file=sys.stderr)
 
     def get_db_list(self):
-        excluded = ['information_schema', 'performance_schema']
+        excluded = ['information_schema', 'performance_schema', 'lost+found']
         cmd = ['/usr/bin/mysql', '--defaults-file=%s' % self.defaults,
                '--execute=SHOW DATABASES', '-B', '-s']
         if self.args.verbose:
