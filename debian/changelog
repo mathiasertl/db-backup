@@ -1,3 +1,10 @@
+db-backup (2012-12-15-1) precise; urgency=low
+
+  * Ignore 'lost+found' database from ext3 filesystems
+  * Some fixes by Sertscho
+
+ -- Mathias Ertl <apt-repository@fsinf.at>  Sat, 15 Dec 2012 14:09:03 +0100
+
 db-backup (2012-12-07-1) precise; urgency=low
 
   * minor fixes
