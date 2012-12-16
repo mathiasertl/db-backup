@@ -68,13 +68,21 @@ class backend(object):
         if 'remote' in self.section:
             ssh = self.get_ssh(path, [gzip, tee, sha1sum, sed])
 
+            cmds = [cmd]
             p1 = Popen(cmd, stdout=PIPE)
             p = p1
             if self.gpg:
                 p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
+                cmds.append(gpg)
+
+            cmds.append(ssh)
+            if self.args.verbose:
+                str_cmds = [ ' '.join(cmd) for cmd in cmds]
+                print('# Dump databases:')
+                print(' | '.join(str_cmds))
 
             p2 = Popen(ssh, stdin=p.stdout, stdout=PIPE)
-            output = p2.communicate()[0]
+            p2.communicate()
             if p2.returncode == 255:
                 raise RuntimeError("SSH returned with exit code 255.")
             elif p2.returncode != 0:
@@ -91,14 +99,18 @@ class backend(object):
             if self.gpg:
                 p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
                 cmds.append(gpg)
+
             p2 = Popen(gzip, stdin=p1.stdout, stdout=PIPE)
             p3 = Popen(tee, stdin=p2.stdout, stdout=PIPE)
             p4 = Popen(sha1sum, stdin=p3.stdout, stdout=PIPE)
             p5 = Popen(sed, stdin=p4.stdout, stdout=f)
+
             cmds += [p2, p3, p4, p5]
             if self.args.verbose:
                 str_cmds = [' '.join(cmd) for cmd in cmds]
-                print('%s # dump databases!' % ' | '.join(str_cmds))
+                print('# Dump databases:')
+                print(' | '.join(str_cmds))
+
             p5.communicate()
             f.close()
 
