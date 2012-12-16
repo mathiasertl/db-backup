@@ -33,7 +33,7 @@ class backend(object):
 
     def make_su(self, cmd):
         if 'su' in self.section:
-            cmd = ['su', self.section.su, '-s',
+            cmd = ['su', self.section['su'], '-s',
                    '/bin/bash', '-c', ' '.join(cmd)]
         return cmd
 
@@ -79,7 +79,7 @@ class backend(object):
 
             cmds.append(ssh)
             if self.args.verbose:
-                str_cmds = [ ' '.join(cmd) for cmd in cmds]
+                str_cmds = [' '.join(cmd) for cmd in cmds]
                 print('# Dump databases:')
                 print(' | '.join(str_cmds))
 
