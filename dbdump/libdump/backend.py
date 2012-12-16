@@ -47,6 +47,8 @@ class backend(object):
 
     def dump(self, db, timestamp):
         cmd = self.make_su(self.get_command(db))
+        if not cmd:
+            return
 
         dirname = os.path.normpath(self.base + '/' + db)
         path = os.path.normpath(dirname + '/' + timestamp)
