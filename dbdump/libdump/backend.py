@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from subprocess import Popen, PIPE
 
+
 class backend(object):
     def __init__(self, section, args):
         self.args = args
@@ -32,15 +33,16 @@ class backend(object):
 
     def make_su(self, cmd):
         if 'su' in self.section:
-            cmd = [ 'su', self.section.su, '-s', '/bin/bash', '-c', ' '.join(cmd) ]
+            cmd = ['su', self.section.su, '-s',
+                   '/bin/bash', '-c', ' '.join(cmd)]
         return cmd
 
     def get_ssh(self, path, cmds):
-        cmds = [ ' '.join(cmd) for cmd in cmds ]
+        cmds = [' '.join(cmd) for cmd in cmds]
         opts = self.section['remote'].split()
-        prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
-        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' %(path)
-        test = [ 'ssh' ] + opts + [ ssh_cmd ]
+        prefix = 'umask 077; mkdir -m 0700 -p %s; ' % os.path.dirname(path)
+        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' % path
+        test = ['ssh'] + opts + [ssh_cmd]
         return test
 
     def dump(self, db, timestamp):
@@ -49,19 +51,19 @@ class backend(object):
         dirname = os.path.normpath(self.base + '/' + db)
         path = os.path.normpath(dirname + '/' + timestamp)
         if self.gpg:
-            gpg = [ 'gpg' ]
+            gpg = ['gpg']
             if 'sign_key' in self.section:
-                gpg += [ '-s', '-u', self.section['sign-key'] ]
+                gpg += ['-s', '-u', self.section['sign-key']]
             if 'recipient' in self.section:
-                gpg += [ '-e', '-r', self.section['recipient'] ]
+                gpg += ['-e', '-r', self.section['recipient']]
             path += '.gpg'
 
         path += '.gz'
 
-        gzip = [ 'gzip', '-f', '-9', '-', '-' ]
-        tee = [ 'tee', path ]
-        sha1sum = [ 'sha1sum' ]
-        sed = [ 'sed', 's/-$/%s/' %(os.path.basename(path)) ]
+        gzip = ['gzip', '-f', '-9', '-', '-']
+        tee = ['tee', path]
+        sha1sum = ['sha1sum']
+        sed = ['sed', 's/-$/%s/' % os.path.basename(path)]
 
         if 'remote' in self.section:
             ssh = self.get_ssh(path, [gzip, tee, sha1sum, sed])
@@ -76,7 +78,8 @@ class backend(object):
             if p2.returncode == 255:
                 raise RuntimeError("SSH returned with exit code 255.")
             elif p2.returncode != 0:
-                raise RuntimeError("%s returned with exit code %s."%(ssh, p2.returncode))
+                raise RuntimeError("%s returned with exit code %s."
+                                   % (ssh, p2.returncode))
         else:
             if not os.path.exists(dirname):
                 os.mkdir(dirname, 0o700)
@@ -94,7 +97,7 @@ class backend(object):
             p5 = Popen(sed, stdin=p4.stdout, stdout=f)
             cmds += [p2, p3, p4, p5]
             if self.args.verbose:
-                str_cmds = [ ' '.join(cmd) for cmd in cmds]
+                str_cmds = [' '.join(cmd) for cmd in cmds]
                 print('%s # dump databases!' % ' | '.join(str_cmds))
             p5.communicate()
             f.close()
