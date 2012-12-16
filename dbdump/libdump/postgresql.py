@@ -17,22 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from subprocess import Popen, PIPE
+
 from libdump import backend
-from subprocess import *
+
 
 class postgresql(backend.backend):
     def get_db_list(self):
-        cmd = [ 'psql', '-Aqt', '-c', '"select datname from pg_database"' ]
+        cmd = ['psql', '-Aqt', '-c', '"select datname from pg_database"']
 
         if 'postgresql-psql-opts' in self.section:
             cmd += self.section['postgresql-psql-opts'].split(' ')
 
         if 'su' in self.section:
-            cmd = [ 'su', self.section['su'], '-s', '/bin/bash', '-c', ' '.join(cmd) ]
+            cmd = ['su', self.section['su'], '-s', '/bin/bash', '-c',
+                    ' '.join(cmd)]
 
         p_list = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p_list.communicate()
-        databases = [ line for line in stdout.decode().strip().split("\n") if line != 'template0' ]
+        databases = [line for line in stdout.decode().strip().split("\n")
+                     if line != 'template0']
 
         p_list.wait()
         if p_list.returncode != 0:
@@ -42,9 +46,8 @@ class postgresql(backend.backend):
         return databases
 
     def get_command(self, database):
-        cmd = [ 'pg_dump', '-c' ]
+        cmd = ['pg_dump', '-c']
         if 'postgresql-pgdump-opts' in self.section:
             cmd += self.section['postgresql-pgdump-opts'].split(' ')
         cmd.append(database)
         return cmd
-
