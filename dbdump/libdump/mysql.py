@@ -84,7 +84,9 @@ class mysql(backend.backend):
         engine_cmd += ['-NB', "--execute=%s" % engine_query]
 
         if self.args.verbose:
-            print('%s # get list of database engines' % ' '.join(engine_cmd))
+            print('# get list of database engines:')
+            print(' '.join(engine_cmd))
+
         p = Popen(engine_cmd, stdout=PIPE)
         types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
