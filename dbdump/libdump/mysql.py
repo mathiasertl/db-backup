@@ -97,7 +97,9 @@ class mysql(backend.backend):
         for table in ignored:
             cmd.append('--ignore-table="%s"' % table)
 
-        if types == ['InnoDB']:
+        if not types:
+            return
+        elif types == ['InnoDB']:
             cmd += ['--single-transaction', '--quick']
         else:
             cmd.append('--lock-tables')
