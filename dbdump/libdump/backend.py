@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os, time
-from subprocess import *
+import os
+from subprocess import Popen, PIPE
+
 
 class backend(object):
     def __init__(self, section, args):
@@ -32,51 +33,63 @@ class backend(object):
 
     def make_su(self, cmd):
         if 'su' in self.section:
-            cmd = [ 'su', self.section.su, '-s', '/bin/bash', '-c', ' '.join(cmd) ]
+            cmd = ['su', self.section['su'], '-s',
+                   '/bin/bash', '-c', ' '.join(cmd)]
         return cmd
 
     def get_ssh(self, path, cmds):
-        cmds = [ ' '.join(cmd) for cmd in cmds ]
+        cmds = [' '.join(cmd) for cmd in cmds]
         opts = self.section['remote'].split()
-        prefix = 'umask 077; mkdir -m 0700 -p %s; ' %(os.path.dirname(path))
-        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' %(path)
-        test = [ 'ssh' ] + opts + [ ssh_cmd ]
+        prefix = 'umask 077; mkdir -m 0700 -p %s; ' % os.path.dirname(path)
+        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' % path
+        test = ['ssh'] + opts + [ssh_cmd]
         return test
 
     def dump(self, db, timestamp):
         cmd = self.make_su(self.get_command(db))
+        if not cmd:
+            return
 
         dirname = os.path.normpath(self.base + '/' + db)
         path = os.path.normpath(dirname + '/' + timestamp)
         if self.gpg:
-            gpg = [ 'gpg' ]
+            gpg = ['gpg']
             if 'sign_key' in self.section:
-                gpg += [ '-s', '-u', self.section['sign-key'] ]
+                gpg += ['-s', '-u', self.section['sign-key']]
             if 'recipient' in self.section:
-                gpg += [ '-e', '-r', self.section['recipient'] ]
+                gpg += ['-e', '-r', self.section['recipient']]
             path += '.gpg'
 
         path += '.gz'
 
-        gzip = [ 'gzip', '-f', '-9', '-', '-' ]
-        tee = [ 'tee', path ]
-        sha1sum = [ 'sha1sum' ]
-        sed = [ 'sed', 's/-$/%s/' %(os.path.basename(path)) ]
+        gzip = ['gzip', '-f', '-9', '-', '-']
+        tee = ['tee', path]
+        sha1sum = ['sha1sum']
+        sed = ['sed', 's/-$/%s/' % os.path.basename(path)]
 
         if 'remote' in self.section:
             ssh = self.get_ssh(path, [gzip, tee, sha1sum, sed])
 
+            cmds = [cmd]
             p1 = Popen(cmd, stdout=PIPE)
             p = p1
             if self.gpg:
                 p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
+                cmds.append(gpg)
+
+            cmds.append(ssh)
+            if self.args.verbose:
+                str_cmds = [' '.join(cmd) for cmd in cmds]
+                print('# Dump databases:')
+                print(' | '.join(str_cmds))
 
             p2 = Popen(ssh, stdin=p.stdout, stdout=PIPE)
-            output = p2.communicate()[0]
+            p2.communicate()
             if p2.returncode == 255:
                 raise RuntimeError("SSH returned with exit code 255.")
             elif p2.returncode != 0:
-                raise RuntimeError("%s returned with exit code %s."%(ssh, p2.returncode))
+                raise RuntimeError("%s returned with exit code %s."
+                                   % (ssh, p2.returncode))
         else:
             if not os.path.exists(dirname):
                 os.mkdir(dirname, 0o700)
@@ -88,14 +101,18 @@ class backend(object):
             if self.gpg:
                 p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
                 cmds.append(gpg)
+
             p2 = Popen(gzip, stdin=p1.stdout, stdout=PIPE)
             p3 = Popen(tee, stdin=p2.stdout, stdout=PIPE)
             p4 = Popen(sha1sum, stdin=p3.stdout, stdout=PIPE)
             p5 = Popen(sed, stdin=p4.stdout, stdout=f)
+
             cmds += [p2, p3, p4, p5]
             if self.args.verbose:
-                str_cmds = [ ' '.join(cmd) for cmd in cmds]
-                print('%s # dump databases!' % ' | '.join(str_cmds))
+                str_cmds = [' '.join(cmd) for cmd in cmds]
+                print('# Dump databases:')
+                print(' | '.join(str_cmds))
+
             p5.communicate()
             f.close()
 
