@@ -1,3 +1,9 @@
+db-backup (2013-04-26-1) precise; urgency=low
+
+  * Add the -E flag to mysqldump
+
+ -- Mathias Ertl <apt-repository@fsinf.at>  Fri, 26 Apr 2013 22:04:39 +0200
+
 db-backup (2012-12-15-1) precise; urgency=low
 
   * Ignore 'lost+found' database from ext3 filesystems
