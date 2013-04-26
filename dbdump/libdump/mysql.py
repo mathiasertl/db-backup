@@ -17,9 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from libdump import backend
+import os
+import stat
+import sys
+
 from subprocess import *
-import os, sys, stat
+
+from libdump import backend
+
 
 class mysql(backend.backend):
 
@@ -33,15 +38,17 @@ class mysql(backend.backend):
 
     def prepare(self):
         if self.defaults and not os.path.exists(self.defaults):
-            print("Error: %s: Does not exist." % self.defaults, file=sys.stderr)
+            print("Error: %s: Does not exist." % self.defaults,
+                  file=sys.stderr)
             sys.exit(1)
         unsafe = stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP
         unsafe |= stat.S_IROTH | stat.S_IWOTH | stat.S_IXOTH
 
         mode = os.stat(self.defaults)[stat.ST_MODE]
         if mode & unsafe != 0:
-            print("Warning: %s: unsafe permissions (fix with 'chmod go-rwx %s')"
-                  % (self.defaults, self.defaults), file=sys.stderr)
+            cmd = 'chmod go-rwx %s' % self.defaults
+            print("Warning: %s: unsafe permissions (fix with '%s')"
+                  % (self.defaults, cmd), file=sys.stderr)
 
     def get_db_list(self):
         excluded = ['information_schema', 'performance_schema', 'lost+found']
@@ -58,40 +65,44 @@ class mysql(backend.backend):
             raise Exception("Unable to get list of databases: %s "
                 % (stderr.decode().strip("\n")))
 
-        return [ db for db in databases if db not in excluded ]
+        return [db for db in databases if db not in excluded]
 
     def get_command(self, database):
         # get list of ignored tables:
         ignored_tables = self.section['mysql-ignore-tables'].split()
-        ignored = [ t for t in ignored_tables if t.startswith("%s." % database) ]
+        ignored = [t for t in ignored_tables if t.startswith("%s." % database)]
 
         # assemble query for used engines in the database
-        engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' AND ENGINE != 'MEMORY'"%database
+        engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' AND ENGINE != 'MEMORY'" % database
         for table in ignored:
-            engine_query += " AND TABLE_NAME != '%s'"%table.split('.')[1]
+            engine_query += " AND TABLE_NAME != '%s'" % table.split('.')[1]
         engine_query += ' GROUP BY ENGINE'
 
-        engine_cmd = [ 'mysql' ]
+        engine_cmd = ['mysql']
         if self.defaults:
             engine_cmd.append('--defaults-file=%s' % self.defaults)
-        engine_cmd += [ '-NB', "--execute=%s" % engine_query ]
+        engine_cmd += ['-NB', "--execute=%s" % engine_query]
 
         if self.args.verbose:
-            print('%s # get list of database engines' % ' '.join(engine_cmd))
+            print('# get list of database engines:')
+            print(' '.join(engine_cmd))
+
         p = Popen(engine_cmd, stdout=PIPE)
         types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
-        cmd = [ 'mysqldump' ]
+        cmd = ['mysqldump', '-E']
         if self.defaults:
             cmd.append('--defaults-file=%s' % self.defaults)
 
         for table in ignored:
             cmd.append('--ignore-table="%s"' % table)
 
-        if types == [ 'InnoDB' ]:
+        if not types:
+            return
+        elif types == ['InnoDB']:
             cmd += ['--single-transaction', '--quick']
         else:
             cmd.append('--lock-tables')
 
-        cmd += [ '--comments', database ]
+        cmd += ['--comments', database]
         return cmd
