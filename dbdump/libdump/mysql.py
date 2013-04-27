@@ -90,10 +90,11 @@ class mysql(backend.backend):
         p = Popen(engine_cmd, stdout=PIPE)
         types = p.communicate()[0].decode('utf-8').strip().split("\n")
 
-        cmd = ['mysqldump', '-E']
+        cmd = ['mysqldump', ]
         if self.defaults:
             cmd.append('--defaults-file=%s' % self.defaults)
-
+        if database == 'mysql':
+            cmd.append('-E')  # AFTER --defaults-file!
         for table in ignored:
             cmd.append('--ignore-table="%s"' % table)
 
