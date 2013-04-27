@@ -1,3 +1,9 @@
+db-backup (2013-04-27-1) precise; urgency=low
+
+  * Only add -E when dumping mysql table, and at correct position
+
+ -- Mathias Ertl <apt-repository@fsinf.at>  Sat, 27 Apr 2013 11:43:03 +0200
+
 db-backup (2013-04-26-1) precise; urgency=low
 
   * Add the -E flag to mysqldump
