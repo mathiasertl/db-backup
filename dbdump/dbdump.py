@@ -22,23 +22,34 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os, sys, time, argparse, configparser
-from libdump import *
+import argparse
+import configparser
+import os
+import sys
+import time
+
+from libdump import ejabberd
+from libdump import mysql
+from libdump import postgresql
+
+def err(msg, *args):
+    print(msg % args, file=sys.stderr)
 
 config_file = ['/etc/dbdump/dbdump.conf', os.path.expanduser('~/.dbdump.conf')]
 
-parser = argparse.ArgumentParser(description="Dump databases to a specified directory.")
+parser = argparse.ArgumentParser(
+    description="Dump databases to a specified directory.")
 parser.add_argument('--version', action='version', version="%(prog)s 1.0")
 parser.add_argument('-c', '--config', action='append', default=config_file,
-    help="""Additional config-files to use (default: %(default)s). Can be given multiple times
-        to name multiple config-files.""")
+    help="""Additional config-files to use (default: %(default)s). Can be
+            given multiple times to name multiple config-files.""")
 parser.add_argument('--verbose', action='store_true', default=False,
     help="Print all called commands to stdout.")
 parser.add_argument('section', action='store', type=str,
-    help="Section in the config-file to use." )
+    help="Section in the config-file to use.")
 args = parser.parse_args()
 
-if args.section=='DEFAULT':
+if args.section == 'DEFAULT':
     parser.error("--section must not be 'DEFAULT'.")
 
 config = configparser.SafeConfigParser({
@@ -52,10 +63,10 @@ if not config.read(args.config):
 
 # check validity of config-file:
 if args.section not in config:
-    print("Error: %s: No section found with that name." % args.section, file=sys.stderr)
+    err("Error: %s: No section found with that name.", args.section)
     sys.exit(1)
 if 'datadir' not in config[args.section]:
-    print("Error: %s: Section does not contain option 'datadir'." % args.section, file=sys.stderr)
+    err("Error: %s: Section does not contain option 'datadir'.", args.section)
     sys.exit(1)
 
 section = config[args.section]
@@ -81,8 +92,8 @@ elif section['backend'] == "postgresql":
 elif section['backend'] == "ejabberd":
     backend = ejabberd.ejabberd(section, args)
 else:
-    print("Error: %s. Unknown backend specified. Only mysql, postgresql and ejabberd are supported."
-        % section['backend'], file=sys.stderr)
+    err("Error: %s. Unknown backend specified. Only mysql, postgresql and "
+        "ejabberd are supported.", section['backend'])
     sys.exit(1)
 
 databases = backend.get_db_list()
