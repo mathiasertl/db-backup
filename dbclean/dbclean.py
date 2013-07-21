@@ -171,31 +171,15 @@ for dir in os.listdir(datadir):
         bck_seconds = calendar.timegm(stamp)
 
         if bck_seconds > now - (hourly * 3600):
-#            print ("%s is hourly and will be kept" % (time.asctime(stamp)))
             continue
-#        else:
-#            print ("%s is hourly but to old." % (time.asctime(stamp)))
 
-        if bck.is_daily():
-            if bck_seconds > now - (daily * 86400):
-#                print("%s is daily and will be kept." % (time.asctime(stamp)))
+        if bck.is_daily() and bck_seconds > now - (daily * 86400):
                 continue
-#            else:
-#                print ("%s is daily but to old." % (time.asctime(stamp)))
 
-        if bck.is_monthly():
-            if bck_seconds > now - (monthly * 2678400):
-#                print("%s is monthly and will be kept." % (time.asctime(stamp)))
+        if bck.is_monthly() and bck_seconds > now - (monthly * 2678400):
                 continue
-#            else:
-#                print ("%s is monthly but to old." % (time.asctime(stamp)))
 
-        if bck.is_yearly():
-            if bck_seconds > now - (yearly * 31622400):
-#                print("%s is yearly and will be kept." % (time.asctime(stamp)))
+        if bck.is_yearly() and bck_seconds > now - (yearly * 31622400):
                 continue
-#            else:
-#                print ("%s is yearly but to old." % (time.asctime(stamp)))
-#        print("%s will be removed." % (time.asctime(stamp)))
 
         bck.remove()
