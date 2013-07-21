@@ -118,6 +118,8 @@ for dir in os.listdir( datadir ):
     if dir.startswith( '.' ):
         # skip hidden directories
         continue
+    if dir == 'lost+found':
+        continue
 
     fullpath = os.path.normpath( datadir + '/' + dir )
     if not os.path.isdir( fullpath ):
