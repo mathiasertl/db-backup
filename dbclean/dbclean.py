@@ -104,19 +104,19 @@ class backup():
         self.files.append(file)
 
     def is_daily(self):
-        if self.time[3] == 0:
+        if self.time.tm_hour == 0:
             return True
         else:
             return False
 
     def is_monthly(self):
-        if self.is_daily() and self.time[2] == 1:
+        if self.is_daily() and self.time.tm_mday == 1:
             return True
         else:
             return False
 
     def is_yearly(self):
-        if self.is_monthly() and self.time[1] == 1:
+        if self.is_monthly() and self.time.tm_mon == 1:
             return True
         else:
             return False
