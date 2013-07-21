@@ -36,7 +36,7 @@ parser.add_argument('-c', '--config', type=str, dest='config', action='append', 
     help="""Additional config-files to use (default: %(default)s). Can be given multiple times
         to name multiple config-files.""")
 parser.add_argument('section', action='store', type=str,
-    help="Section in the config-file to use." )
+    help="Section in the config-file to use.")
 args = parser.parse_args()
 
 if args.section=='DEFAULT':
@@ -78,104 +78,104 @@ yearly = int(config[args.section]['yearly'])
 class backup():
     files = []
 
-    def __init__( self, time, base, file ):
+    def __init__(self, time, base, file):
         self.time = time
         self.base = base
         self.files = [ file ]
 
-    def add( self, file ):
-        self.files.append( file )
+    def add(self, file):
+        self.files.append(file)
 
-    def is_daily( self ):
+    def is_daily(self):
         if self.time[3] == 0:
             return True
         else:
             return False
 
-    def is_monthly( self ):
+    def is_monthly(self):
         if self.is_daily() and self.time[2] == 1:
             return True
         else:
             return False
 
-    def is_yearly( self ):
+    def is_yearly(self):
         if self.is_monthly() and self.time[1] == 1:
             return True
         else:
             return False
 
-    def remove( self ):
+    def remove(self):
         for file in self.files:
-            os.remove( file )
+            os.remove(file)
 
-    def __str__( self ):
+    def __str__(self):
         return "%s in %s" %(self.files, self.base)
 
 now = time.time()
 
 # loop through each dir in datadir
-for dir in os.listdir( datadir ):
-    if dir.startswith( '.' ):
+for dir in os.listdir(datadir):
+    if dir.startswith('.'):
         # skip hidden directories
         continue
     if dir == 'lost+found':
         continue
 
-    fullpath = os.path.normpath( datadir + '/' + dir )
-    if not os.path.isdir( fullpath ):
-        print( "Warning: %s: Not a directory." % (fullpath) )
+    fullpath = os.path.normpath(datadir + '/' + dir)
+    if not os.path.isdir(fullpath):
+        print("Warning: %s: Not a directory." % (fullpath))
         continue
-    os.chdir( fullpath )
+    os.chdir(fullpath)
 
     backups = {}
 
-    files = os.listdir( '.' )
+    files = os.listdir('.')
     files.sort()
 
     for file in files:
-        filestamp = file.split( '.' )[0]
+        filestamp = file.split('.')[0]
         timestamp = ''
         try:
-            timestamp = time.strptime( filestamp, timeformat )
+            timestamp = time.strptime(filestamp, timeformat)
         except ValueError as e:
-            print( '%s: %s' %(file, e) )
+            print('%s: %s' %(file, e))
 
-        if timestamp not in list( backups.keys() ):
-            backups[timestamp] = backup( timestamp, fullpath, file )
+        if timestamp not in list(backups.keys()):
+            backups[timestamp] = backup(timestamp, fullpath, file)
         else:
-            backups[timestamp].add( file )
+            backups[timestamp].add(file)
 
 
     for stamp in list(backups.keys()):
         bck = backups[stamp]
-        bck_seconds = calendar.timegm( stamp )
+        bck_seconds = calendar.timegm(stamp)
 
-        if bck_seconds > now - ( hourly * 3600 ):
-#            print ( "%s is hourly and will be kept" % ( time.asctime( stamp ) ) )
+        if bck_seconds > now - (hourly * 3600):
+#            print ("%s is hourly and will be kept" % (time.asctime(stamp)))
             continue
 #        else:
-#            print ("%s is hourly but to old." % ( time.asctime( stamp ) ) )
+#            print ("%s is hourly but to old." % (time.asctime(stamp)))
 
         if bck.is_daily():
-            if bck_seconds > now - ( daily * 86400 ):
-#                print( "%s is daily and will be kept." % ( time.asctime( stamp ) ) )
+            if bck_seconds > now - (daily * 86400):
+#                print("%s is daily and will be kept." % (time.asctime(stamp)))
                 continue
 #            else:
-#                print ("%s is daily but to old." % ( time.asctime( stamp ) ) )
+#                print ("%s is daily but to old." % (time.asctime(stamp)))
 
         if bck.is_monthly():
-            if bck_seconds > now - ( monthly * 2678400 ):
-#                print( "%s is monthly and will be kept." % ( time.asctime( stamp ) ) )
+            if bck_seconds > now - (monthly * 2678400):
+#                print("%s is monthly and will be kept." % (time.asctime(stamp)))
                 continue
 #            else:
-#                print ("%s is monthly but to old." % ( time.asctime( stamp ) ) )
+#                print ("%s is monthly but to old." % (time.asctime(stamp)))
 
         if bck.is_yearly():
-            if bck_seconds > now - ( yearly * 31622400 ):
-#                print( "%s is yearly and will be kept." % ( time.asctime( stamp ) ) )
+            if bck_seconds > now - (yearly * 31622400):
+#                print("%s is yearly and will be kept." % (time.asctime(stamp)))
                 continue
 #            else:
-#                print ("%s is yearly but to old." % ( time.asctime( stamp ) ) )
-#        print( "%s will be removed." % ( time.asctime( stamp ) ) )
+#                print ("%s is yearly but to old." % (time.asctime(stamp)))
+#        print("%s will be removed." % (time.asctime(stamp)))
 
         bck.remove()
