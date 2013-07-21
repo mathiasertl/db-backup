@@ -1,0 +1,5 @@
+2013-07-21:
+* Massive pep8 cleanup
+* Update documentation (remove old --section parameter)
+* Add this ChangeLog
+* Add the "last" option, dbclean will always keep the given last backups.
