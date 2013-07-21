@@ -9,7 +9,7 @@ for a month, monthly backups for a year, etc.
 Please see the README file for how to use this script and supported
 features. You might also try calling this program with '--help'.
 
-Copyright 2009 Mathias Ertl
+Copyright 2009 - 2013 Mathias Ertl
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,21 +25,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os, time, sys, calendar, configparser, argparse
+import argparse
+import calendar
+import configparser
+import os
+import sys
+import time
 
-config_file = ['/etc/dbclean/dbclean.conf', os.path.expanduser('~/.dbclean.conf')]
+config_file = [
+    '/etc/dbclean/dbclean.conf',
+    os.path.expanduser('~/.dbclean.conf')
+]
 
 parser = argparse.ArgumentParser(version="%prog 1.0",
-    description = """Cleanup regular database dumps created by dbdump. This script keeps backups
-        at given intervals for a given amount of time.""")
-parser.add_argument('-c', '--config', type=str, dest='config', action='append', default=config_file,
-    help="""Additional config-files to use (default: %(default)s). Can be given multiple times
-        to name multiple config-files.""")
+    description="""Cleanup regular database dumps created by dbdump. This
+script keeps backups at given intervals for a given amount of time.""")
+parser.add_argument(
+    '-c', '--config', type=str, dest='config', action='append',
+    default=config_file, help="""Additional config-files to use (default:
+        %(default)s). Can be given multiple times to name multiple
+        config-files.""")
 parser.add_argument('section', action='store', type=str,
-    help="Section in the config-file to use.")
+                    help="Section in the config-file to use.")
 args = parser.parse_args()
 
-if args.section=='DEFAULT':
+if args.section == 'DEFAULT':
     parser.error("--section must not be 'DEFAULT'.")
 
 config = configparser.SafeConfigParser({
@@ -52,10 +62,12 @@ if not config.read(args.config):
 
 # check validity of config-file:
 if args.section not in config:
-    print("Error: %s: No section found with that name." % args.section, file=sys.stderr)
+    print("Error: %s: No section found with that name." % args.section,
+          file=sys.stderr)
     sys.exit(1)
 if 'datadir' not in config[args.section]:
-    print("Error: %s: Section does not contain option 'datadir'." % args.section, file=sys.stderr)
+    print("Error: %s: Section does not contain option 'datadir'." % args.section,
+          file=sys.stderr)
     sys.exit(1)
 
 # get directory containing backups:
@@ -75,13 +87,14 @@ daily = int(config[args.section]['daily'])
 monthly = int(config[args.section]['monthly'])
 yearly = int(config[args.section]['yearly'])
 
+
 class backup():
     files = []
 
     def __init__(self, time, base, file):
         self.time = time
         self.base = base
-        self.files = [ file ]
+        self.files = [file]
 
     def add(self, file):
         self.files.append(file)
@@ -109,7 +122,7 @@ class backup():
             os.remove(file)
 
     def __str__(self):
-        return "%s in %s" %(self.files, self.base)
+        return "%s in %s" % (self.files, self.base)
 
 now = time.time()
 
@@ -138,13 +151,12 @@ for dir in os.listdir(datadir):
         try:
             timestamp = time.strptime(filestamp, timeformat)
         except ValueError as e:
-            print('%s: %s' %(file, e))
+            print('%s: %s' % (file, e))
 
         if timestamp not in list(backups.keys()):
             backups[timestamp] = backup(timestamp, fullpath, file)
         else:
             backups[timestamp].add(file)
-
 
     for stamp in list(backups.keys()):
         bck = backups[stamp]
