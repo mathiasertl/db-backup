@@ -156,6 +156,7 @@ for dir in os.listdir(datadir):
             timestamp = time.strptime(filestamp, timeformat)
         except ValueError as e:
             print('%s: %s' % (file, e))
+            continue
 
         if timestamp not in list(backups.keys()):
             backups[timestamp] = backup(timestamp, fullpath, file)
