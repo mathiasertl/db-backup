@@ -1,3 +1,9 @@
+db-backup (2013-07-21-1) precise; urgency=low
+
+  * Bump from master-branch (dbdump and dbclean now have their own changelog)
+
+ -- Mathias Ertl <apt-repository@fsinf.at>  Sun, 21 Jul 2013 21:36:57 +0200
+
 db-backup (2013-04-27-1) precise; urgency=low
 
   * Only add -E when dumping mysql table, and at correct position
