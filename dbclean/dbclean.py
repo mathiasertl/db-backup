@@ -32,6 +32,10 @@ import os
 import sys
 import time
 
+
+def err(msg, *args):
+    print(msg % args, file=sys.stderr)
+
 config_file = [
     '/etc/dbclean/dbclean.conf',
     os.path.expanduser('~/.dbclean.conf')
@@ -62,12 +66,10 @@ if not config.read(args.config):
 
 # check validity of config-file:
 if args.section not in config:
-    print("Error: %s: No section found with that name." % args.section,
-          file=sys.stderr)
+    err("Error: %s: No section found with that name.", args.section)
     sys.exit(1)
 if 'datadir' not in config[args.section]:
-    print("Error: %s: Section does not contain option 'datadir'." % args.section,
-          file=sys.stderr)
+    err("Error: %s: Section does not contain option 'datadir'.", args.section)
     sys.exit(1)
 
 # get directory containing backups:
@@ -75,10 +77,10 @@ datadir = config.get(args.section, 'datadir')
 
 # check that given directory exists and is a directory:
 if not os.path.exists(datadir):
-    print("Error: %s: No such directory." % (datadir), file=sys.stderr)
+    err("Error: %s: No such directory.", datadir)
     sys.exit(1)
 elif not os.path.isdir(datadir):
-    print("Error: %s: Not a directory." % (datadir), file=sys.stderr)
+    err("Error: %s: Not a directory.", datadir)
     sys.exit(1)
 
 timeformat = config[args.section]['format']
@@ -136,7 +138,7 @@ for dir in os.listdir(datadir):
 
     fullpath = os.path.normpath(datadir + '/' + dir)
     if not os.path.isdir(fullpath):
-        print("Warning: %s: Not a directory." % (fullpath))
+        print("Warning: %s: Not a directory." % fullpath)
         continue
     os.chdir(fullpath)
 
