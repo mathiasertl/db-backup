@@ -59,7 +59,8 @@ if args.section == 'DEFAULT':
 config = configparser.SafeConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
     'hourly': '24', 'daily': '31',
-    'monthly': '12', 'yearly': '3'
+    'monthly': '12', 'yearly': '3',
+    'last': '3',
 })
 if not config.read(args.config):
     parser.error("No config-files could be read.")
@@ -88,6 +89,7 @@ hourly = int(config[args.section]['hourly'])
 daily = int(config[args.section]['daily'])
 monthly = int(config[args.section]['monthly'])
 yearly = int(config[args.section]['yearly'])
+last = int(config[args.section]['last'])
 
 
 class backup():
@@ -160,7 +162,11 @@ for dir in os.listdir(datadir):
         else:
             backups[timestamp].add(file)
 
-    for stamp in list(backups.keys()):
+    backup_items = sorted(backups.items(), key=lambda t: t[0])
+    if last:  # NOTE: if last == 0, the slice returns an empty list!
+        backup_items = backup_items[:-last]
+
+    for stamp, bck in backup_items:
         bck = backups[stamp]
         bck_seconds = calendar.timegm(stamp)
 

@@ -4,6 +4,8 @@
 # sections.
 #hourly = 72
 #daily = 31
+# Always keep the last three backups
+#last = 3
 #
 # NOTE: You can also use the interpolation feature provided by the
 # 	ConfigParser python module. The following line is used in the
