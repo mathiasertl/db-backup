@@ -1,6 +1,7 @@
 db-backup (2013-07-21-1) precise; urgency=low
 
   * Bump from master-branch (dbdump and dbclean now have their own changelog)
+  * update cron.d file for dbclean
 
  -- Mathias Ertl <apt-repository@fsinf.at>  Sun, 21 Jul 2013 21:36:57 +0200
 
