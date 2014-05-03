@@ -7,6 +7,6 @@ setup(name='dbdump',
       description='Database dump utilities',
       author='Mathias Ertl',
       author_email='mati@er.tl',
-      url='https://git.fsinf.at/fsinf/db-backup',
+      url='https://github.com/mathiasertl/db-backup.git',
       packages=['libdump'],
      )
