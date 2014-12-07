@@ -50,7 +50,7 @@ class backend(object):
         if not cmd:
             return
 
-        dirname = os.path.join(self.base, db)
+        dirname = os.path.abspath(os.path.join(self.base, db))
         path = os.path.join(dirname, '%s.gz' % timestamp)
         if self.gpg:
             gpg = ['gpg']
