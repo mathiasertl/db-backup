@@ -40,7 +40,7 @@ class ejabberd(backend.backend):
         if 'ejabberd-auth' in self.section:
             cmd += ['--auth', self.section['ejabberd-auth'].split()]
 
-        cmd += ['dump', '%sd.dump' % database]
+        cmd += ['dump', '%s.dump' % database]
         if self.args.verbose:
             print('%s # prepare db' % ' '.join(cmd))
         p = subprocess.Popen(cmd)
