@@ -95,25 +95,26 @@ class backend(object):
                 os.mkdir(dirname, 0o700)
 
             f = open(path + '.sha1', 'w')
-            cmds = [cmd]
-            p1 = Popen(cmd, stdout=PIPE)
-            p = p1
+            cmds = [cmd, gzip, ]  # just for output
+            p_dump = Popen(cmd, stdout=PIPE)
+            p_gzip = Popen(gzip, stdin=p_dump.stdout, stdout=PIPE)
+            tee_pipe = p_gzip.stdout
             if self.gpg:
-                p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
+                p_gpg = Popen(gpg, stdin=p_dump.stdout, stdout=PIPE)
+                tee_pipe = p_gpg.stdout
                 cmds.append(gpg)
 
-            p2 = Popen(gzip, stdin=p1.stdout, stdout=PIPE)
-            p3 = Popen(tee, stdin=p2.stdout, stdout=PIPE)
-            p4 = Popen(sha1sum, stdin=p3.stdout, stdout=PIPE)
-            p5 = Popen(sed, stdin=p4.stdout, stdout=f)
+            p_tee = Popen(tee, stdin=tee_pipe, stdout=PIPE)
+            p_sha1 = Popen(sha1sum, stdin=p_tee.stdout, stdout=PIPE)
+            p_sed = Popen(sed, stdin=p_sha1.stdout, stdout=f)
 
-            cmds += [p2, p3, p4, p5]
+            cmds += [tee, sha1sum, sed]
             if self.args.verbose:
                 str_cmds = [' '.join(c) for c in cmds]
                 print('# Dump databases:')
                 print(' | '.join(str_cmds))
 
-            p5.communicate()
+            p_sed.communicate()
             f.close()
 
     def prepare(self):
