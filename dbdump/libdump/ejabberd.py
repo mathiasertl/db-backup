@@ -30,7 +30,7 @@ class ejabberd(backend.backend):
 
     def get_command(self, database):
         path = os.path.normpath(os.path.join(
-            self.section['ejabberd-base-dir'], '%s.backup' % database))
+            self.section['ejabberd-base-dir'], '%s.dump' % database))
         return ['cat', path]
 
     def prepare_db(self, database):
@@ -40,7 +40,7 @@ class ejabberd(backend.backend):
         if 'ejabberd-auth' in self.section:
             cmd += ['--auth', self.section['ejabberd-auth'].split()]
 
-        cmd += ['backup', database + '.backup']
+        cmd += ['dump', '%s.dump' % database]
         if self.args.verbose:
             print('%s # prepare db' % ' '.join(cmd))
         p = subprocess.Popen(cmd)
@@ -48,7 +48,7 @@ class ejabberd(backend.backend):
 
     def cleanup_db(self, database):
         path = os.path.normpath(os.path.join(
-            self.section['ejabberd-base-dir'], '%s.backup' % database))
+            self.section['ejabberd-base-dir'], '%s.dump' % database))
         if self.args.verbose:
             print('rm %s # remove local dump' % path)
         os.remove(path)
