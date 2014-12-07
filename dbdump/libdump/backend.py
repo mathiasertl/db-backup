@@ -68,13 +68,15 @@ class backend(object):
         sed = ['sed', 's/-$/%s/' % os.path.basename(path)]
 
         if 'remote' in self.section:
-            ssh = self.get_ssh(path, [gzip, tee, sha1sum, sed])
+            ssh = self.get_ssh(path, [tee, sha1sum, sed])
 
-            cmds = [cmd]
-            p1 = Popen(cmd, stdout=PIPE)
-            p = p1
+            cmds = [cmd, gzip, ]  # just for output
+            p_dump = Popen(cmd, stdout=PIPE)
+            p_gzip = Popen(gzip, stdin=p_dump.stdout, stdout=PIPE)
+            ssh_stdin = p_gzip.stdout  # what to pipe into SSH
             if self.gpg:
-                p = Popen(gpg, stdin=p1.stdout, stdout=PIPE)
+                p_gpg = Popen(gpg, stdin=p_gzip.stdout, stdout=PIPE)
+                ssh_stdin = p_gpg.stdout
                 cmds.append(gpg)
 
             cmds.append(ssh)
@@ -83,13 +85,13 @@ class backend(object):
                 print('# Dump databases:')
                 print(' | '.join(str_cmds))
 
-            p2 = Popen(ssh, stdin=p.stdout, stdout=PIPE)
-            p2.communicate()
-            if p2.returncode == 255:
+            p_ssh = Popen(ssh, stdin=ssh_stdin, stdout=PIPE)
+            p_ssh.communicate()
+            if p_ssh.returncode == 255:
                 raise RuntimeError("SSH returned with exit code 255.")
-            elif p2.returncode != 0:
+            elif p_ssh.returncode != 0:
                 raise RuntimeError("%s returned with exit code %s."
-                                   % (ssh, p2.returncode))
+                                   % (ssh, p_ssh.returncode))
         else:
             if not os.path.exists(dirname):
                 os.mkdir(dirname, 0o700)
