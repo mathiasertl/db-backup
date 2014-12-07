@@ -4,6 +4,7 @@ db-backup (2014-12-09-1) unstable; urgency=low
   * Compress dumps before encrypting them for better compression results.
   * Update maintainer address.
   * Increase debhelper dependency, update VCS-* fields.
+  * Update copyright file to up-to-date format.
 
  -- Mathias Ertl <mati@er.tl>  Sun, 07 Dec 2014 14:20:37 +0100
 
