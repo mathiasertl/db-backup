@@ -1,3 +1,12 @@
+db-backup (2014-12-09-1) unstable; urgency=low
+
+  * Create text-dumps for ejabberd.
+  * Compress dumps before encrypting them for better compression results.
+  * Update maintainer address.
+  * Increase debhelper dependency, update VCS-* fields.
+
+ -- Mathias Ertl <mati@er.tl>  Sun, 07 Dec 2014 14:20:37 +0100
+
 db-backup (2013-07-21-1) precise; urgency=low
 
   * Bump from master-branch (dbdump and dbclean now have their own changelog)
