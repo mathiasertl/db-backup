@@ -50,8 +50,8 @@ class backend(object):
         if not cmd:
             return
 
-        dirname = os.path.normpath(self.base + '/' + db)
-        path = os.path.normpath(dirname + '/' + timestamp)
+        dirname = os.path.join(self.base, db)
+        path = os.path.join(dirname, '%s.gz' % timestamp)
         if self.gpg:
             gpg = ['gpg']
             if 'sign_key' in self.section:
@@ -59,8 +59,6 @@ class backend(object):
             if 'recipient' in self.section:
                 gpg += ['-e', '-r', self.section['recipient']]
             path += '.gpg'
-
-        path += '.gz'
 
         gzip = ['gzip', '-f', '-9', '-', '-']
         tee = ['tee', path]
