@@ -79,7 +79,7 @@ class backend(object):
 
             cmds.append(ssh)
             if self.args.verbose:
-                str_cmds = [' '.join(cmd) for cmd in cmds]
+                str_cmds = [' '.join(c) for c in cmds]
                 print('# Dump databases:')
                 print(' | '.join(str_cmds))
 
@@ -109,7 +109,7 @@ class backend(object):
 
             cmds += [p2, p3, p4, p5]
             if self.args.verbose:
-                str_cmds = [' '.join(cmd) for cmd in cmds]
+                str_cmds = [' '.join(c) for c in cmds]
                 print('# Dump databases:')
                 print(' | '.join(str_cmds))
 
