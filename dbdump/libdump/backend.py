@@ -33,7 +33,7 @@ class backend(object):
 
     def make_su(self, cmd):
         if 'su' in self.section:
-            cmd = ['su', self.section['su'], '-s',
+            cmd = ['su', '-', self.section['su'], '-s',
                    '/bin/bash', '-c', ' '.join(cmd)]
         return cmd
 
