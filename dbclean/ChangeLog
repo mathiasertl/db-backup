@@ -1,5 +1,6 @@
 2016-02-14:
 * Fix --version parameter.
+* Use a text-width of 99 chars.
 
 2013-07-21:
 * Massive pep8 cleanup

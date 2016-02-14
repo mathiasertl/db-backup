@@ -1,29 +1,24 @@
 #!/usr/bin/env python3
-
-"""
-This program is designed to clean files from a specified directory.
-The program is designed to work together with dbdump.py, so it is
-basically designed to clean out regular database dumps. The files
-are kept at a certain granularity (so daily backups will be kept
-for a month, monthly backups for a year, etc.
-Please see the README file for how to use this script and supported
-features. You might also try calling this program with '--help'.
-
-Copyright 2009 - 2013 Mathias Ertl
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
+# -*- coding: utf-8 -*-
+#
+# This program is designed to clean files from a specified directory.  The program is designed to
+# work together with dbdump.py, so it is basically designed to clean out regular database dumps.
+# The files are kept at a certain granularity (so daily backups will be kept for a month, monthly
+# backups for a year, etc.  Please see the README file for how to use this script and supported
+# features. You might also try calling this program with '--help'.
+#
+# Copyright 2009 - 2016 Mathias Ertl
+#
+# This program is free software: you can redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
 import calendar
@@ -42,16 +37,14 @@ config_file = [
 ]
 
 parser = argparse.ArgumentParser(
-    description="""Cleanup regular database dumps created by dbdump. This
-script keeps backups at given intervals for a given amount of time.""")
+    description="""Cleanup regular database dumps created by dbdump. This script keeps backups at
+given intervals for a given amount of time.""")
 parser.add_argument('--version', action='version', version='%(prog)s 1.1')
 parser.add_argument(
     '-c', '--config', type=str, dest='config', action='append',
-    default=config_file, help="""Additional config-files to use (default:
-        %(default)s). Can be given multiple times to name multiple
-        config-files.""")
-parser.add_argument('section', action='store', type=str,
-                    help="Section in the config-file to use.")
+    default=config_file, help="""Additional config-files to use (default: %(default)s). Can be
+        given multiple times to name multiple config-files.""")
+parser.add_argument('section', action='store', type=str, help="Section in the config-file to use.")
 args = parser.parse_args()
 
 if args.section == 'DEFAULT':
