@@ -41,9 +41,10 @@ config_file = [
     os.path.expanduser('~/.dbclean.conf')
 ]
 
-parser = argparse.ArgumentParser(version="%prog 1.0",
+parser = argparse.ArgumentParser(
     description="""Cleanup regular database dumps created by dbdump. This
 script keeps backups at given intervals for a given amount of time.""")
+parser.add_argument('--version', action='version', version='%(prog)s 1.1')
 parser.add_argument(
     '-c', '--config', type=str, dest='config', action='append',
     default=config_file, help="""Additional config-files to use (default:

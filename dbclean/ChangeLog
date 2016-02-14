@@ -1,3 +1,6 @@
+2016-02-14:
+* Fix --version parameter.
+
 2013-07-21:
 * Massive pep8 cleanup
 * Update documentation (remove old --section parameter)
