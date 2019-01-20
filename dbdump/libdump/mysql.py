@@ -14,9 +14,8 @@
 import os
 import stat
 import sys
-
-from subprocess import Popen
 from subprocess import PIPE
+from subprocess import Popen
 
 from libdump import backend
 

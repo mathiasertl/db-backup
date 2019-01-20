@@ -11,7 +11,8 @@
 # You should have received a copy of the GNU General Public License along with dbdump. If not,
 # see <http://www.gnu.org/licenses/>.
 
-from subprocess import Popen, PIPE
+from subprocess import PIPE
+from subprocess import Popen
 
 from libdump import backend
 

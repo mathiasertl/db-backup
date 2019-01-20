@@ -11,9 +11,10 @@
 # You should have received a copy of the GNU General Public License along with dbdump. If not,
 # see <http://www.gnu.org/licenses/>.
 
-import shlex
 import os
-from subprocess import Popen, PIPE
+import shlex
+from subprocess import PIPE
+from subprocess import Popen
 
 
 class backend:
