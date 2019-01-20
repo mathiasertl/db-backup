@@ -35,7 +35,7 @@ class backend(object):
     def get_ssh(self, path, cmds):
         cmds = [' '.join(cmd) for cmd in cmds]
         prefix = 'umask 077; mkdir -m 0700 -p %s; ' % os.path.dirname(path)
-        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' % path
+        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha256' % path
 
         ssh = ['ssh']
         timeout = self.section['ssh-timeout']
@@ -67,11 +67,11 @@ class backend(object):
 
         gzip = ['gzip', '-f', '-9', '-', '-']
         tee = ['tee', path]
-        sha1sum = ['sha1sum']
+        sha = ['sha256sum']
         sed = ['sed', 's/-$/%s/' % os.path.basename(path)]
 
         if 'remote' in self.section:
-            ssh = self.get_ssh(path, [tee, sha1sum, sed])
+            ssh = self.get_ssh(path, [tee, sha, sed])
 
             cmds = [cmd, gzip, ]  # just for output
             p_dump = Popen(cmd, stdout=PIPE)
@@ -99,7 +99,7 @@ class backend(object):
             if not os.path.exists(dirname):
                 os.mkdir(dirname, 0o700)
 
-            f = open(path + '.sha1', 'w')
+            f = open(path + '.sha256', 'w')
             cmds = [cmd, gzip, ]  # just for output
             p_dump = Popen(cmd, stdout=PIPE)
             p_gzip = Popen(gzip, stdin=p_dump.stdout, stdout=PIPE)
@@ -110,10 +110,10 @@ class backend(object):
                 cmds.append(gpg)
 
             p_tee = Popen(tee, stdin=tee_pipe, stdout=PIPE)
-            p_sha1 = Popen(sha1sum, stdin=p_tee.stdout, stdout=PIPE)
-            p_sed = Popen(sed, stdin=p_sha1.stdout, stdout=f)
+            p_sha = Popen(sha, stdin=p_tee.stdout, stdout=PIPE)
+            p_sed = Popen(sed, stdin=p_sha.stdout, stdout=f)
 
-            cmds += [tee, sha1sum, sed]
+            cmds += [tee, sha, sed]
             if self.args.verbose:
                 str_cmds = [' '.join(c) for c in cmds]
                 print('# Dump databases:')
