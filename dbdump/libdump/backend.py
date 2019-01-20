@@ -11,6 +11,7 @@
 # You should have received a copy of the GNU General Public License along with dbdump. If not,
 # see <http://www.gnu.org/licenses/>.
 
+import shlex
 import os
 from subprocess import Popen, PIPE
 
@@ -33,11 +34,21 @@ class backend(object):
 
     def get_ssh(self, path, cmds):
         cmds = [' '.join(cmd) for cmd in cmds]
-        opts = self.section['remote'].split()
         prefix = 'umask 077; mkdir -m 0700 -p %s; ' % os.path.dirname(path)
         ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' % path
-        test = ['ssh'] + opts + [ssh_cmd]
-        return test
+
+        ssh = ['ssh']
+        timeout = self.section['ssh-timeout']
+        if timeout:
+            ssh += ['-o', 'ConnectTimeout=%s' % timeout, ]
+
+        opts = self.section['ssh-options']
+        if opts:
+            ssh += shlex.split(opts)
+
+        ssh += [self.section['remote'], ssh_cmd]
+
+        return ssh
 
     def dump(self, db, timestamp):
         cmd = self.make_su(self.get_command(db))

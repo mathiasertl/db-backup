@@ -54,6 +54,8 @@ config = configparser.SafeConfigParser({
     'datadir': '/var/backups/%(backend)s',
     'mysql-ignore-tables': '',
     'ejabberd-base-dir': '/var/lib/ejabberd',
+    'ssh-timeout': '10',
+    'ssh-options': '',
 })
 if not config.read(args.config):
     parser.error("No config-files could be read.")
