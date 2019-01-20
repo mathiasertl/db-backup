@@ -16,7 +16,7 @@ import os
 from subprocess import Popen, PIPE
 
 
-class backend(object):
+class backend:
     def __init__(self, section, args):
         self.args = args
         self.section = section
@@ -93,8 +93,7 @@ class backend(object):
             if p_ssh.returncode == 255:
                 raise RuntimeError("SSH returned with exit code 255.")
             elif p_ssh.returncode != 0:
-                raise RuntimeError("%s returned with exit code %s."
-                                   % (ssh, p_ssh.returncode))
+                raise RuntimeError("%s returned with exit code %s." % (ssh, p_ssh.returncode))
         else:
             if not os.path.exists(dirname):
                 os.mkdir(dirname, 0o700)
