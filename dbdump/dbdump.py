@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # This program is designed to regulary dump SQL databases into a specified directory for backup
 # purposes. Please see the README file for how to use this script and supported features. You might
 # also try calling this program with '--help'.
 #
-# Copyright 2009-2016 Mathias Ertl
+# Copyright 2009-2019 Mathias Ertl <mati@fsinf.at>
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -31,6 +30,7 @@ from libdump import postgresql
 
 def err(msg, *args):
     print(msg % args, file=sys.stderr)
+
 
 config_file = ['/etc/dbdump/dbdump.conf', os.path.expanduser('~/.dbdump.conf')]
 

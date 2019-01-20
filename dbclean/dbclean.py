@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # This program is designed to clean files from a specified directory.  The program is designed to
 # work together with dbdump.py, so it is basically designed to clean out regular database dumps.
@@ -7,7 +6,7 @@
 # backups for a year, etc.  Please see the README file for how to use this script and supported
 # features. You might also try calling this program with '--help'.
 #
-# Copyright 2009 - 2016 Mathias Ertl
+# Copyright 2009 - 2019 Mathias Ertl <mati@fsinf.at>
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -30,6 +29,7 @@ import time
 
 def err(msg, *args):
     print(msg % args, file=sys.stderr)
+
 
 config_file = [
     '/etc/dbclean/dbclean.conf',
@@ -84,6 +84,7 @@ daily = int(config[args.section]['daily'])
 monthly = int(config[args.section]['monthly'])
 yearly = int(config[args.section]['yearly'])
 last = int(config[args.section]['last'])
+now = time.time()
 
 
 class backup():
@@ -122,7 +123,6 @@ class backup():
     def __str__(self):
         return "%s in %s" % (self.files, self.base)
 
-now = time.time()
 
 # loop through each dir in datadir
 for dir in os.listdir(datadir):
