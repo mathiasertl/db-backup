@@ -49,7 +49,7 @@ args = parser.parse_args()
 if args.section == 'DEFAULT':
     parser.error("--section must not be 'DEFAULT'.")
 
-config = configparser.SafeConfigParser({
+config = configparser.ConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
     'datadir': '/var/backups/%(backend)s',
     'mysql-ignore-tables': '',
