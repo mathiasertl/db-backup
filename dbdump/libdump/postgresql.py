@@ -1,23 +1,18 @@
-"""
-This file is part of dbdump.
+# This file is part of dbdump (https://github.com/mathiasertl/db-backup).
+#
+# dbdump is free software: you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# dbdump is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with dbdump. If not,
+# see <http://www.gnu.org/licenses/>.
 
-Copyright 2009-2012 Mathias Ertl
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
-from subprocess import Popen, PIPE
+from subprocess import PIPE
+from subprocess import Popen
 
 from libdump import backend
 
@@ -31,7 +26,7 @@ class postgresql(backend.backend):
 
         if 'su' in self.section:
             cmd = ['su', self.section['su'], '-s', '/bin/bash', '-c',
-                    ' '.join(cmd)]
+                   ' '.join(cmd)]
 
         p_list = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p_list.communicate()
@@ -41,7 +36,7 @@ class postgresql(backend.backend):
         p_list.wait()
         if p_list.returncode != 0:
             raise Exception("Unable to get list of databases: %s "
-                % (stderr.decode().strip("\n")))
+                            % (stderr.decode().strip("\n")))
 
         return databases
 

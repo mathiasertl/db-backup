@@ -1,27 +1,23 @@
-"""
-This file is part of dbdump.
-
-Copyright 2009, 2010 Mathias Ertl
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
+# This file is part of dbdump (https://github.com/mathiasertl/db-backup).
+#
+# dbdump is free software: you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# dbdump is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with dbdump. If not,
+# see <http://www.gnu.org/licenses/>.
 
 import os
-from subprocess import Popen, PIPE
+import shlex
+from subprocess import PIPE
+from subprocess import Popen
 
 
-class backend(object):
+class backend:
     def __init__(self, section, args):
         self.args = args
         self.section = section
@@ -33,17 +29,27 @@ class backend(object):
 
     def make_su(self, cmd):
         if 'su' in self.section:
-            cmd = ['su', self.section['su'], '-s',
+            cmd = ['su', '-', self.section['su'], '-s',
                    '/bin/bash', '-c', ' '.join(cmd)]
         return cmd
 
     def get_ssh(self, path, cmds):
         cmds = [' '.join(cmd) for cmd in cmds]
-        opts = self.section['remote'].split()
         prefix = 'umask 077; mkdir -m 0700 -p %s; ' % os.path.dirname(path)
-        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha1' % path
-        test = ['ssh'] + opts + [ssh_cmd]
-        return test
+        ssh_cmd = prefix + ' | '.join(cmds) + ' > %s.sha256' % path
+
+        ssh = ['ssh']
+        timeout = self.section['ssh-timeout']
+        if timeout:
+            ssh += ['-o', 'ConnectTimeout=%s' % timeout, ]
+
+        opts = self.section['ssh-options']
+        if opts:
+            ssh += shlex.split(opts)
+
+        ssh += [self.section['remote'], ssh_cmd]
+
+        return ssh
 
     def dump(self, db, timestamp):
         cmd = self.make_su(self.get_command(db))
@@ -62,11 +68,11 @@ class backend(object):
 
         gzip = ['gzip', '-f', '-9', '-', '-']
         tee = ['tee', path]
-        sha1sum = ['sha1sum']
+        sha = ['sha256sum']
         sed = ['sed', 's/-$/%s/' % os.path.basename(path)]
 
         if 'remote' in self.section:
-            ssh = self.get_ssh(path, [tee, sha1sum, sed])
+            ssh = self.get_ssh(path, [tee, sha, sed])
 
             cmds = [cmd, gzip, ]  # just for output
             p_dump = Popen(cmd, stdout=PIPE)
@@ -88,13 +94,12 @@ class backend(object):
             if p_ssh.returncode == 255:
                 raise RuntimeError("SSH returned with exit code 255.")
             elif p_ssh.returncode != 0:
-                raise RuntimeError("%s returned with exit code %s."
-                                   % (ssh, p_ssh.returncode))
+                raise RuntimeError("%s returned with exit code %s." % (ssh, p_ssh.returncode))
         else:
             if not os.path.exists(dirname):
                 os.mkdir(dirname, 0o700)
 
-            f = open(path + '.sha1', 'w')
+            f = open(path + '.sha256', 'w')
             cmds = [cmd, gzip, ]  # just for output
             p_dump = Popen(cmd, stdout=PIPE)
             p_gzip = Popen(gzip, stdin=p_dump.stdout, stdout=PIPE)
@@ -105,10 +110,10 @@ class backend(object):
                 cmds.append(gpg)
 
             p_tee = Popen(tee, stdin=tee_pipe, stdout=PIPE)
-            p_sha1 = Popen(sha1sum, stdin=p_tee.stdout, stdout=PIPE)
-            p_sed = Popen(sed, stdin=p_sha1.stdout, stdout=f)
+            p_sha = Popen(sha, stdin=p_tee.stdout, stdout=PIPE)
+            p_sed = Popen(sed, stdin=p_sha.stdout, stdout=f)
 
-            cmds += [tee, sha1sum, sed]
+            cmds += [tee, sha, sed]
             if self.args.verbose:
                 str_cmds = [' '.join(c) for c in cmds]
                 print('# Dump databases:')
