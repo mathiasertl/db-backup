@@ -1,3 +1,28 @@
+db-backup (2019-07-20-1) unstable; urgency=low
+
+  [ David Kaufmann ]
+  * execute commands as database users in a login shell
+
+  [ Mathias Ertl ]
+  * fix --version parameter
+  * use tw=99
+  * tw=99
+  * cosmetics
+  * add pyenv version
+  * fix spaces
+  * add dev reqs
+  * add tox.ini
+  * udpate style, unify header
+  * various style improvs
+  * switch to sha256 checksums
+  * minor style
+  * isort cleanup
+
+  [ somenet ]
+  * Update dbdump.py
+
+ -- David Kaufmann <astra@ionic.at>  Sat, 20 Jul 2019 17:32:00 +0200
+
 db-backup (2014-12-09-1) unstable; urgency=low
 
   * Create text-dumps for ejabberd.
