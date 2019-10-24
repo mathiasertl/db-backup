@@ -12,6 +12,7 @@
 # see <http://www.gnu.org/licenses/>.
 
 import os
+import shlex
 import subprocess
 
 from libdump import backend
@@ -27,7 +28,7 @@ class ejabberd(backend.backend):
         return ['cat', path]
 
     def prepare_db(self, database):
-        cmd = ['ejabberdctl']
+        cmd = ['ejabberdctl'] + shlex.split(self.section['ejabberd-options'])
         if 'ejabberd-node' in self.section:
             cmd += ['--node', self.section['ejabberd-node']]
         if 'ejabberd-auth' in self.section:

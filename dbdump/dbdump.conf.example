@@ -81,6 +81,9 @@ remote = user@backup.example.com
 # Dump database from this ejabberd node (optional):
 #ejabberd-node = ejabberd
 
+# Any other command-line arguments to ejabberd
+#ejabberd-options = --no-timeout
+
 # Authenticate with the erlang node. This specifies a normal account on
 # the jabber server (optional):
 #ejabberd-auth = user jabber.example.com password

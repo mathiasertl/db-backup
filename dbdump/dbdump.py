@@ -54,6 +54,7 @@ config = configparser.SafeConfigParser({
     'datadir': '/var/backups/%(backend)s',
     'mysql-ignore-tables': '',
     'ejabberd-base-dir': '/var/lib/ejabberd',
+    'ejabberd-options': '--no-timeout',  # https://github.com/processone/ejabberd/issues/866
     'ssh-timeout': '10',
     'ssh-options': '',
 })
