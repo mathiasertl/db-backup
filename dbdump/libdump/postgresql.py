@@ -19,14 +19,18 @@ from libdump import backend
 
 class postgresql(backend.backend):
     def get_db_list(self):
-        cmd = ['psql', '-Aqt', '-c', '"select datname from pg_database"']
+        cmd = ['psql', '-Aqt', '-c', 'select datname from pg_database']
 
         if 'postgresql-psql-opts' in self.section:
             cmd += self.section['postgresql-psql-opts'].split(' ')
 
+        if 'postgresql-connectstring' in self.section:
+            cmd.append(self.section['postgresql-connectstring'])
+
         if 'su' in self.section:
+            quoted_args = [f"\"{arg}\"" if ' ' in arg else arg for arg in cmd ]
             cmd = ['su', self.section['su'], '-s', '/bin/bash', '-c',
-                   ' '.join(cmd)]
+                   ' '.join(quoted_args)]
 
         p_list = Popen(cmd, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p_list.communicate()
@@ -44,5 +48,12 @@ class postgresql(backend.backend):
         cmd = ['pg_dump', '-c']
         if 'postgresql-pgdump-opts' in self.section:
             cmd += self.section['postgresql-pgdump-opts'].split(' ')
-        cmd.append(database)
+
+        connectstring_options = []
+        if 'postgresql-connectstring' in self.section:
+            connectstring_options = self.section['postgresql-connectstring'].split(' ')
+
+        connectstring_options.append(f"dbname={database}")
+        cmd.append(' '.join(connectstring_options))
+
         return cmd
