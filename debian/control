@@ -3,7 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Mathias Ertl <mati@er.tl>
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 10), python3-all, rename
+Build-Depends: debhelper (>= 10), dh-python, python3-all, rename
 Vcs-Browser: https://github.com/mathiasertl/db-backup
 Vcs-Git: https://github.com/mathiasertl/db-backup.git
 
