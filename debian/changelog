@@ -1,3 +1,9 @@
+db-backup (2021-09-09-1) unstable; urgency=medium
+
+  * remove deprecation warning for dbclean too
+
+ -- David Kaufmann <astra@ionic.at>  Wed, 08 Sep 2021 23:17:36 +0200
+
 db-backup (2019-07-20-1) unstable; urgency=low
 
   [ David Kaufmann ]
