@@ -71,7 +71,7 @@ if 'datadir' not in config[args.section]:
 
 section = config[args.section]
 
-if 'remote' not in section:
+if 'remote' not in section and 'borg' not in section:
     # Note that if we dump to a remote location, there is no real way to check to check if datadir
     # exists and is writeable. We have to rely on the competence of the admin in that case.
     datadir = section['datadir']
