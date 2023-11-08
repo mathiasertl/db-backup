@@ -1,0 +1,8 @@
+# 1.2
+* flake8/isort cleanup
+* Add new options: ssh-timeout and ssh-options
+* Switch to generating sha256 checksums
+
+2013-07-21:
+* pep8 cleanup
+* add this ChangeLog

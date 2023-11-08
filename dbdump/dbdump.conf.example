@@ -11,74 +11,92 @@
 # Note that the default is the section name, if you do not explicitly set
 # this in this file.
 #backend=mysql
-#
+
 # The base directory to dump your databases to.
 # Default is /var/backups/<backend>
 #datadir=/var/backups/mysql
-#
+
 # Use su to drop privileges to the specified user for all SQL related
 # commands (optional):
 #su=mysql
-#
+
 # Store dumps on a remote location via SSH. REMOTE will be passed to ssh
 # unchanged (optional):
 remote = user@backup.example.com
-#
+
+# Store dumps with borgbackup. Specify the common directory, each db will have
+# its own repository.
+#borg = user@backup.example.com
+
+# Encrypt borg backups, store the keyfile on the server and encrypt it with the
+# password specified in borg-key, if this parameter is given.
+#borg-key = add-a-secret-password-here
+
+# Override the default ssh connect-timeout of 10 seconds:
+#ssh-timeout = 10
+
+# Space-separated list of any other SSH options to pass to ssh, for example:
+#ssh-options = -o Compression=yes -v
+
 # Sign and/or encrypt backups using the specified GPG keys (optional):
 #sign-key = dbdump@hostname.example.net
 #recipient = admin@hostname.example.net
-#
+
 # You can also use the interpolation feature provided by the
 # ConfigParser python module.
-#
+
 # You can even specify new settings to use in later interpolation:
 #hostname = example.com
-#
+
 # We set the default datadir using dynamic interpolation:
 #datadir = /var/backups/%(hostname)s/%(backend)s/
-#
+
 #[mysql]
 # Dump MySQL databases. Because of the settings in the DEFAULT section,
 # the backend used here is 'mysql' and datadir evaluates to:
 #       /var/backups/example.com/mysql/
 # ... and backups will be signed and encrypted (see first lines in the
 # DEFAULT section).
-#
+
 # MYSQL OPTIONS:
 #
 # Use a custom defaults-file. This file should be used to specify access
 # credentials (default given here):
 #mysql-defaults = ~/.my.cnf
-#
+
 # Ignore given tables when dumping. This can be useful if a certain
 # table does not use InnoDB and the database could not be dumped in a
 # single transaction otherwise (optional):
 #mysql-ignore-tables = db_foo.table_bla db_bar.table_hugo
-#
+
 #[postgresql]
 # Dump PostgreSQL databases.
-#
+
 # lets override the default datadir, just to be clear:
 #datadir=/somewhere/else/
-#
+
 # POSTGRESQL OPTIONS:
-#
+
 # Additional command-line parameters for psql and pgdump (optional):
+#postgresql-connectstring = host=localhost port=5432
 #postgresql-psql-opts = --someopt
 #postgresql-pgdump-opts = --otheropt
-#
+
 #[ejabberd]
 # Dump ejabberd databases.
-#
+
 # EJABBERD OPTIONS:
 #
 # Dump database from this ejabberd node (optional):
 #ejabberd-node = ejabberd
-#
+
+# Any other command-line arguments to ejabberd
+#ejabberd-options = --no-timeout
+
 # Authenticate with the erlang node. This specifies a normal account on
 # the jabber server (optional):
 #ejabberd-auth = user jabber.example.com password
-#
+
 # Base directory where the ejabberd database is stored (default given
 # here):
 #ejabberd-base-dir = /var/lib/ejabberd

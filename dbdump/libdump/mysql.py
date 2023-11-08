@@ -1,27 +1,21 @@
-"""
-This file is part of dbdump.
-
-Copyright 2009-2012 Mathias Ertl
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
+# This file is part of dbdump (https://github.com/mathiasertl/db-backup).
+#
+# dbdump is free software: you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# dbdump is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with dbdump. If not,
+# see <http://www.gnu.org/licenses/>.
 
 import os
 import stat
 import sys
-
-from subprocess import *
+from subprocess import PIPE
+from subprocess import Popen
 
 from libdump import backend
 
@@ -63,7 +57,7 @@ class mysql(backend.backend):
 
         if p_list.returncode != 0:
             raise Exception("Unable to get list of databases: %s "
-                % (stderr.decode().strip("\n")))
+                            % (stderr.decode().strip("\n")))
 
         return [db for db in databases if db not in excluded]
 
@@ -73,7 +67,7 @@ class mysql(backend.backend):
         ignored = [t for t in ignored_tables if t.startswith("%s." % database)]
 
         # assemble query for used engines in the database
-        engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' AND ENGINE != 'MEMORY'" % database
+        engine_query = "select ENGINE from information_schema.TABLES WHERE TABLE_SCHEMA='%s' AND ENGINE != 'MEMORY'" % database  # NOQA
         for table in ignored:
             engine_query += " AND TABLE_NAME != '%s'" % table.split('.')[1]
         engine_query += ' GROUP BY ENGINE'

@@ -1,7 +1,7 @@
-Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?revision=173&view=markup
-Upstream-Name: fw-rules
-Upstream-Contact: Mathias Ertl <mati@fsinf.at>
-Source: https://git.fsinf.at/fsinf/fw-rules
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: db-backup
+Upstream-Contact: Mathias Ertl <mati@er.tl>
+Source: https://github.com/mathiasertl/db-backup
 
 Files: *
 Copyright: Copyright (c) 2011, Mathias Ertl <mati@fsinf.at>

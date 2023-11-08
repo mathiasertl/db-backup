@@ -1,3 +1,71 @@
+db-backup (2023-11-08-1) unstable; urgency=low
+
+  [ Mathias Ertl ]
+  * add --no-timeout option to ejabberdctl
+  * ignore .tox
+  * add py38
+  * style
+  * update reqs
+
+  [ David Kaufmann ]
+  * fix DeprecationWarning for SafeConfigParser in dbclean too
+  * use connectstring for connecting to databases
+  * add borg backup support
+  * update changelog
+  * update debian/control to debhelper v10
+  * add dh-python to control
+  * update debian-compat to 10
+
+ -- David Kaufmann <astra@ionic.at>  Wed, 08 Nov 2023 03:47:28 +0100
+
+db-backup (2021-09-09-1) unstable; urgency=medium
+
+  * remove deprecation warning for dbclean too
+
+ -- David Kaufmann <astra@ionic.at>  Wed, 08 Sep 2021 23:17:36 +0200
+
+db-backup (2019-07-20-1) unstable; urgency=low
+
+  [ David Kaufmann ]
+  * execute commands as database users in a login shell
+
+  [ Mathias Ertl ]
+  * fix --version parameter
+  * use tw=99
+  * tw=99
+  * cosmetics
+  * add pyenv version
+  * fix spaces
+  * add dev reqs
+  * add tox.ini
+  * udpate style, unify header
+  * various style improvs
+  * switch to sha256 checksums
+  * minor style
+  * isort cleanup
+
+  [ somenet ]
+  * Update dbdump.py
+
+ -- David Kaufmann <astra@ionic.at>  Sat, 20 Jul 2019 17:32:00 +0200
+
+db-backup (2014-12-09-1) unstable; urgency=low
+
+  * Create text-dumps for ejabberd.
+  * Compress dumps before encrypting them for better compression results.
+  * Update maintainer address.
+  * Increase debhelper dependency, update VCS-* fields.
+  * Update copyright file to up-to-date format.
+
+ -- Mathias Ertl <mati@er.tl>  Sun, 07 Dec 2014 14:20:37 +0100
+
+db-backup (2013-07-21-1) precise; urgency=low
+
+  * Bump from master-branch (dbdump and dbclean now have their own changelog)
+  * update cron.d file for dbclean
+
+ -- Mathias Ertl <apt-repository@fsinf.at>  Sun, 21 Jul 2013 21:36:57 +0200
+
 db-backup (2013-04-27-1) precise; urgency=low
 
   * Only add -E when dumping mysql table, and at correct position

@@ -13,7 +13,7 @@ to get it working.
 
 Simply check out the git-repository:
 
-    git clone https://git.fsinf.at/fsinf/db-backup.git
+    git clone https://github.com/mathiasertl/db-backup.git
 
 If you don't want to specify the full path, you can of course copy dbdump.py
 somewhere in your path (/usr/local/bin is usually good). Take care to copy
