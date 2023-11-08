@@ -1,3 +1,23 @@
+db-backup (2023-11-08-1) unstable; urgency=low
+
+  [ Mathias Ertl ]
+  * add --no-timeout option to ejabberdctl
+  * ignore .tox
+  * add py38
+  * style
+  * update reqs
+
+  [ David Kaufmann ]
+  * fix DeprecationWarning for SafeConfigParser in dbclean too
+  * use connectstring for connecting to databases
+  * add borg backup support
+  * update changelog
+  * update debian/control to debhelper v10
+  * add dh-python to control
+  * update debian-compat to 10
+
+ -- David Kaufmann <astra@ionic.at>  Wed, 08 Nov 2023 03:47:28 +0100
+
 db-backup (2021-09-09-1) unstable; urgency=medium
 
   * remove deprecation warning for dbclean too
