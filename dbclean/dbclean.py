@@ -50,7 +50,7 @@ args = parser.parse_args()
 if args.section == 'DEFAULT':
     parser.error("--section must not be 'DEFAULT'.")
 
-config = configparser.SafeConfigParser({
+config = configparser.ConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
     'hourly': '24', 'daily': '31',
     'monthly': '12', 'yearly': '3',

@@ -24,6 +24,14 @@
 # unchanged (optional):
 remote = user@backup.example.com
 
+# Store dumps with borgbackup. Specify the common directory, each db will have
+# its own repository.
+#borg = user@backup.example.com
+
+# Encrypt borg backups, store the keyfile on the server and encrypt it with the
+# password specified in borg-key, if this parameter is given.
+#borg-key = add-a-secret-password-here
+
 # Override the default ssh connect-timeout of 10 seconds:
 #ssh-timeout = 10
 
@@ -70,6 +78,7 @@ remote = user@backup.example.com
 # POSTGRESQL OPTIONS:
 
 # Additional command-line parameters for psql and pgdump (optional):
+#postgresql-connectstring = host=localhost port=5432
 #postgresql-psql-opts = --someopt
 #postgresql-pgdump-opts = --otheropt
 

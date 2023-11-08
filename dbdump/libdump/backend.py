@@ -71,7 +71,52 @@ class backend:
         sha = ['sha256sum']
         sed = ['sed', 's/-$/%s/' % os.path.basename(path)]
 
-        if 'remote' in self.section:
+        if 'borg' in self.section:
+            borg_check = ['borg', 'info']
+            borg_init = ['borg', 'init', '--umask', '0077', '--make-parent-dirs']
+            borg_create = ['borg', 'create', '--umask', '0077', '--noctime', '--nobirthtime', '--compression', 'zstd', '--files-cache', 'disabled', '--content-from-command', '--']
+            borg_repo = self.section['borg']
+
+            borg_env = os.environ.copy()
+            borg_env['BORG_RELOCATED_REPO_ACCESS_IS_OK'] = 'yes'
+
+            if 'borg-key' in self.section:
+                borg_env['BORG_PASSPHRASE'] = self.section['borg-key']
+                borg_init += ['--encryption', 'repokey-blake2']
+            else:
+                borg_env['BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK'] = 'yes'
+                borg_init += ['--encryption', 'none']
+
+            borg_check += [f"{borg_repo}/{db}"]
+            borg_init += [f"{borg_repo}/{db}"]
+            borg_create += [f"{borg_repo}/{db}" + "::" + f"{timestamp}"]
+            borg_create += cmd
+
+            if self.args.verbose:
+                str_cmds = [' '.join(c) for c in cmd]
+                print('# Dump databases:')
+                print(' | '.join(str_cmds))
+
+            # check if repo already exists
+            p_check = Popen(borg_check, env=borg_env, stdout=PIPE)
+            stdout, stderr = p_check.communicate()
+            if p_check.returncode != 0:
+                # repo is missing, create it
+                p_init = Popen(borg_init, env=borg_env, stdout=PIPE)
+                stdout, stderr = p_init.communicate()
+                if p_init.returncode != 0:
+                    raise RuntimeError(f"{borg_init} returned with exit code {p_init.returncode}. (stderr: {stderr})")
+
+            # create backup
+            p_create = Popen(borg_create, env=borg_env, stdout=PIPE)
+            stdout, stderr = p_create.communicate()
+            if self.args.verbose:
+                print("# borg_create:")
+                print(' | '.join)
+            if p_create.returncode != 0:
+                raise RuntimeError(f"{borg_create} returned with exit code {p_create.returncode}. (stderr: {stderr})")
+
+        elif 'remote' in self.section:
             ssh = self.get_ssh(path, [tee, sha, sed])
 
             cmds = [cmd, gzip, ]  # just for output
