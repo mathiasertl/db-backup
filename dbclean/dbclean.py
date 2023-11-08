@@ -50,7 +50,7 @@ args = parser.parse_args()
 if args.section == 'DEFAULT':
     parser.error("--section must not be 'DEFAULT'.")
 
-config = configparser.SafeConfigParser({
+config = configparser.ConfigParser({
     'format': '%%Y-%%m-%%d_%%H:%%M:%%S',
     'hourly': '24', 'daily': '31',
     'monthly': '12', 'yearly': '3',
@@ -169,12 +169,12 @@ for dir in os.listdir(datadir):
             continue
 
         if bck.is_daily() and bck_seconds > now - (daily * 86400):
-                continue
+            continue
 
         if bck.is_monthly() and bck_seconds > now - (monthly * 2678400):
-                continue
+            continue
 
         if bck.is_yearly() and bck_seconds > now - (yearly * 31622400):
-                continue
+            continue
 
         bck.remove()
